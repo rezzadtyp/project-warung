@@ -49,7 +49,7 @@ export const getTxsService = async (
         userId: user.id,
         ...where,
       },
-    });
+    }); 
 
     return {
       data: transactions,
