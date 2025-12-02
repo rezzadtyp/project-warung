@@ -87,62 +87,69 @@ const AboutSection = () => {
   ];
 
   return (
-    <section id="docs" className="min-h-screen bg-black py-28 px-6">
+    <section id="docs" className="min-h-screen bg-background py-28 px-6">
       <div className="container mx-auto max-w-7xl">
-        {/* Section Header */}
+        {/* Header */}
         <div className="text-center mb-32 space-y-6">
           <div className="inline-block mb-4">
-            <p className="text-white/40 text-sm uppercase tracking-widest font-medium">Process</p>
-            <div className="mx-auto mt-2 w-8 h-px bg-white/30" />
+            <p className="text-muted-foreground text-sm uppercase tracking-widest font-medium">
+              Process
+            </p>
+            <div className="mx-auto mt-2 w-8 h-px bg-border" />
           </div>
-          <h2 className="text-6xl md:text-8xl font-serif text-white leading-tight font-extralight tracking-tight">
+
+          <h2 className="text-6xl md:text-8xl font-serif text-card-foreground leading-tight font-extralight tracking-tight">
             How It
             <span className="relative inline-block ml-4">
               <span className="italic font-normal">Works</span>
-              <span className="absolute -bottom-3 left-0 w-full h-px bg-white origin-left transform scale-x-0 hover:scale-x-100 transition-transform duration-700"></span>
+              <span
+                className="absolute -bottom-3 left-0 w-full h-px bg-border origin-left
+                transform scale-x-0 hover:scale-x-100 transition-transform duration-700"
+              />
             </span>
           </h2>
-          <p className="text-white/50 text-xl max-w-2xl mx-auto leading-relaxed font-light">
-            Seamless cross-border payments in four simple steps. Fast, secure, and transparent.
+
+          <p className="text-muted-foreground text-xl max-w-2xl mx-auto leading-relaxed font-light">
+            Seamless cross-border payments in four simple steps. Fast, secure,
+            and transparent.
           </p>
         </div>
 
-        {/* Steps Grid */}
+        {/* Steps */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {steps.map((step, index) => (
             <div
               key={index}
-              className="relative group bg-white/5 border border-white/10 rounded-3xl p-12 hover:border-white/20 hover:bg-white/10 transition-all duration-700 hover:shadow-2xl hover:shadow-white/5 overflow-hidden"
+              className="relative group bg-card border border-border rounded-3xl p-12 
+              transition-all duration-700 hover:border-primary hover:shadow-xl"
             >
-              {/* Gradient border effect on hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/10 via-transparent to-white/5" />
-              </div>
-
-              {/* Step Number & Icon */}
-              <div className="flex items-start justify-between mb-10 relative z-10">
-                <span className="text-4xl font-extralight text-white/20 group-hover:text-white/40 transition-colors duration-500">
+              {/* Number & Icon */}
+              <div className="flex items-start justify-between mb-10">
+                <span className="text-4xl font-extralight text-muted-foreground">
                   {step.number}
                 </span>
-                <div className="text-white/30 group-hover:text-white/70 transition-colors duration-500 transform group-hover:scale-110 transition-transform">
+                <div className="text-muted-foreground group-hover:text-primary transition-colors">
                   {step.icon}
                 </div>
               </div>
 
-              {/* Content */}
-              <h3 className="text-3xl font-light text-white tracking-tight mb-6 relative z-10">
+              <h3 className="text-3xl font-light text-card-foreground tracking-tight mb-6">
                 {step.title}
               </h3>
-              <p className="text-white/60 text-lg leading-relaxed font-light mb-10 relative z-10">
+
+              <p className="text-muted-foreground text-lg leading-relaxed font-light mb-10">
                 {step.description}
               </p>
 
-              {/* Image Placeholder */}
-              <div className="relative w-full h-56 bg-white/5 rounded-xl border border-white/10 flex items-center justify-center group-hover:border-white/20 transition-colors duration-500 overflow-hidden">
+              {/* Preview Box */}
+              <div
+                className="relative w-full h-56 bg-card border border-border rounded-xl 
+                flex items-center justify-center transition-colors duration-500"
+              >
                 <div className="text-center space-y-4">
-                  <div className="w-20 h-20 mx-auto bg-white/5 rounded-xl flex items-center justify-center group-hover:bg-white/10 transition-colors duration-500">
+                  <div className="w-20 h-20 mx-auto bg-card rounded-xl flex items-center justify-center">
                     <svg
-                      className="w-10 h-10 text-white/15 group-hover:text-white/30 transition-colors duration-500"
+                      className="w-10 h-10 text-muted-foreground"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -155,7 +162,7 @@ const AboutSection = () => {
                       />
                     </svg>
                   </div>
-                  <p className="text-white/25 text-xs uppercase tracking-widest font-medium">
+                  <p className="text-muted-foreground text-xs uppercase tracking-widest font-medium">
                     Preview
                   </p>
                 </div>
