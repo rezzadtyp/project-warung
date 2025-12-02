@@ -1,9 +1,13 @@
-import ConnectButton from "@/components/shared/ConnectButton";
+import AboutSection from "@/components/homepage/AboutSection";
+import DemoSection from "@/components/homepage/DemoSection";
+import HeroSection from "@/components/homepage/HeroSection";
 
 const IndexPage = () => {
   return (
     <div>
-      <ConnectButton />
+      <HeroSection />
+      <DemoSection />
+      <AboutSection />
     </div>
   );
 };
