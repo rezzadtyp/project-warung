@@ -17,7 +17,7 @@ const ConnectButton = () => {
     <Button
       onClick={() => open()}
       variant={"outline"}
-      className="rounded-full text-white"
+      className="rounded-full bg-card text-card-foreground border-border hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
     >
       Connect
     </Button>
