@@ -190,8 +190,40 @@
   button {
     @apply cursor-pointer;
   }
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  [contenteditable] {
+    font-size: 16px !important;         
+  }
+
+  @media (max-width: 639px) {
+    input[type="text"],
+    input[type="search"],
+    input[type="email"],
+    input[type="password"],
+    textarea,
+    [contenteditable] {
+      transform: scale(0.875);
+      transform-origin: left center;
+    }
+  }
+
+  button, a {
+    touch-action: manipulation;
+  }
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+@layer utilities {
+  .min-h-screen-safe {
+    min-height: 100vh;
+    min-height: 100dvh;
+    min-height: 100svh;
+  }
 }
