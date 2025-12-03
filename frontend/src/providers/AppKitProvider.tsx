@@ -6,7 +6,7 @@ import { WagmiProvider } from "wagmi";
 
 const queryClient = new QueryClient();
 
-const projectId = "9f08f9ee7d6f9d01ad116dfe80f904d1";
+const projectId = import.meta.env.VITE_PUBLIC_REOWN_PROJECT_ID; // WILL NOT USE FOR PRODUCTION
 
 const metadata = {
   name: "Warung",

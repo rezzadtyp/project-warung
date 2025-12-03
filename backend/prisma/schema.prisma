@@ -21,8 +21,14 @@ model User {
   updatedAt    DateTime      @updatedAt
   chats        Chat[]
   transactions Transaction[]
-
+  role         UserRole      @default(USER)
+  
   @@map("users")
+}
+
+enum UserRole {
+  USER
+  MERCHANT
 }
 
 model Chat {
