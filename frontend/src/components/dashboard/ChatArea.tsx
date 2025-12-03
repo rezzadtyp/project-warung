@@ -3,13 +3,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Message } from "@/lib/types";
-import { CornerDownLeft, Mic, MicOff, Sparkles } from "lucide-react";
-import { useState } from "react";
+import { CornerDownLeft, Menu, Mic, MicOff, Sparkles } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useSidebar } from "../utils/useSidebar";
 
 interface ChatAreaProps {
   messages?: Message[];
   onSendMessage?: (content: string) => void;
 }
+
+const useMobileViewport = () => {
+  useEffect(() => {
+    const setHeight = () => {
+      const vh = window.visualViewport?.height || window.innerHeight;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+      document.body.style.height = `${vh}px`;
+    };
+
+    setHeight();
+    window.visualViewport?.addEventListener("resize", setHeight);
+    window.addEventListener("orientationchange", setHeight);
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", setHeight);
+      window.removeEventListener("orientationchange", setHeight);
+    };
+  }, []);
+};
 
 export function ChatArea({
   messages: initialMessages = [],
@@ -18,6 +38,9 @@ export function ChatArea({
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
+  const { toggleSidebar } = useSidebar();
+
+  useMobileViewport();
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -40,20 +63,34 @@ export function ChatArea({
 
   return (
     <div className="flex h-full flex-col bg-background">
+      {/* Mobile Header with Menu Toggle */}
+      <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border bg-card">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleSidebar}
+          className="h-8 w-8"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+        <span className="text-sm font-medium">Chat</span>
+        <div className="w-8" /> {/* Spacer for centering */}
+      </div>
+
       {/* Messages */}
-      <ScrollArea className="flex-1 px-4 py-6">
-        <div className="mx-auto max-w-3xl space-y-6">
+      <ScrollArea className="flex-1 px-3 sm:px-4 py-4 sm:py-6">
+        <div className="mx-auto max-w-3xl space-y-4 sm:space-y-6">
           {/* Empty State */}
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full mt-24">
-              <div className="h-16 w-16 rounded-2xl bg-card flex items-center justify-center mb-6 border border-border">
-                <Sparkles className="h-8 w-8 text-muted-foreground" />
+            <div className="flex flex-col items-center justify-center h-full mt-16 sm:mt-24">
+              <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-xl sm:rounded-2xl bg-card flex items-center justify-center mb-4 sm:mb-6 border border-border">
+                <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
               </div>
 
-              <p className="text-lg font-medium text-card-foreground mb-2">
+              <p className="text-base sm:text-lg font-medium text-card-foreground mb-1 sm:mb-2">
                 How can I help you today?
               </p>
-              <p className="text-sm text-muted-foreground text-center max-w-md">
+              <p className="text-xs sm:text-sm text-muted-foreground text-center max-w-md px-4">
                 Start typing or use voice to begin a conversation
               </p>
             </div>
@@ -63,31 +100,33 @@ export function ChatArea({
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex gap-3 ${
+              className={`flex gap-2 sm:gap-3 ${
                 message.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
               {message.role === "assistant" && (
-                <Avatar className="h-8 w-8 border border-border">
-                  <AvatarFallback className="bg-card text-card-foreground text-xs font-medium">
+                <Avatar className="h-7 w-7 sm:h-8 sm:w-8 border border-border flex-shrink-0">
+                  <AvatarFallback className="bg-card text-card-foreground text-[10px] sm:text-xs font-medium">
                     AI
                   </AvatarFallback>
                 </Avatar>
               )}
 
               <div
-                className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-sm transition-all border border-border ${
+                className={`max-w-[85%] sm:max-w-[75%] rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-sm transition-all border border-border ${
                   message.role === "user"
                     ? "bg-card text-card-foreground rounded-br-sm"
                     : "bg-muted text-card-foreground rounded-bl-sm"
                 }`}
               >
-                <p className="text-sm leading-relaxed">{message.content}</p>
+                <p className="text-xs sm:text-sm leading-relaxed">
+                  {message.content}
+                </p>
               </div>
 
               {message.role === "user" && (
-                <Avatar className="h-8 w-8 border border-border">
-                  <AvatarFallback className="bg-card text-card-foreground text-xs font-medium">
+                <Avatar className="h-7 w-7 sm:h-8 sm:w-8 border border-border flex-shrink-0">
+                  <AvatarFallback className="bg-card text-card-foreground text-[10px] sm:text-xs font-medium">
                     You
                   </AvatarFallback>
                 </Avatar>
@@ -98,14 +137,14 @@ export function ChatArea({
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="border-t border-border bg-background/80 backdrop-blur-sm px-4 py-4">
+      <div className="border-t border-border bg-background/80 backdrop-blur-sm px-3 sm:px-4 py-3 sm:py-4">
         <div className="mx-auto max-w-3xl">
-          <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-2 shadow-sm">
+          <div className="flex items-center gap-1.5 sm:gap-2 rounded-full border border-border bg-card px-2 sm:px-3 py-1.5 sm:py-2 shadow-sm">
             {/* Mic Button */}
             <Button
               variant="ghost"
               size="icon"
-              className={`h-8 w-8 rounded-full transition-all ${
+              className={`h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all flex-shrink-0 ${
                 isListening
                   ? "bg-destructive/20 text-destructive"
                   : "hover:bg-muted"
@@ -113,32 +152,32 @@ export function ChatArea({
               onClick={toggleSpeechRecognition}
             >
               {isListening ? (
-                <MicOff className="h-4 w-4" />
+                <MicOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               ) : (
-                <Mic className="h-4 w-4" />
+                <Mic className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               )}
             </Button>
 
-            {/* Input */}
+            {/* Input - CRITICAL FIX: 16px on mobile */}
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               placeholder="Type your message..."
-              className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-2 py-1 text-sm"
+              className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-1 sm:px-2 py-1 text-base sm:text-sm"
             />
 
             {/* Send Button */}
             <Button
               size="icon"
-              className="h-8 w-8 rounded-full bg-primary hover:bg-primary/80 transition-all"
+              className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-primary hover:bg-primary/80 transition-all flex-shrink-0"
               onClick={handleSend}
             >
-              <CornerDownLeft className="h-4 w-4 text-primary-foreground" />
+              <CornerDownLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-foreground" />
             </Button>
           </div>
 
-          <p className="mt-2 text-center text-xs text-muted-foreground">
+          <p className="mt-1.5 sm:mt-2 text-center text-[10px] sm:text-xs text-muted-foreground">
             {isListening ? "Listening..." : "Press microphone for voice input"}
           </p>
         </div>
