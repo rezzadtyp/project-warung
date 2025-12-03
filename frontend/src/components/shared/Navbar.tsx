@@ -6,9 +6,13 @@ import {
 } from "@/components/ui/navigation-menu";
 import { ThemeToggle } from "./ThemeToggle";
 import { useState } from "react";
+import { useAuth } from "@/providers/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-sm border-b border-[var(--border)]">
@@ -47,6 +51,21 @@ const Navbar = () => {
                     DOCS
                   </NavigationMenuLink>
                 </NavigationMenuItem>
+
+                {isAuthenticated && (
+                  <NavigationMenuItem>
+                    <NavigationMenuLink
+                      href="/dashboard"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate("/dashboard");
+                      }}
+                      className="text-[var(--foreground)]/70 hover:text-[var(--foreground)] transition-colors"
+                    >
+                      DASHBOARD
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                )}
               </NavigationMenuList>
             </NavigationMenu>
           </div>
@@ -104,9 +123,20 @@ const Navbar = () => {
             >
               DOCS
             </a>
-            <div className="pt-2">
-              <ThemeToggle />
-            </div>
+            {isAuthenticated && (
+              <a
+                href="/dashboard"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate("/dashboard");
+                  setIsMenuOpen(false);
+                }}
+                className="block text-[var(--foreground)]/70 hover:text-[var(--foreground)] transition-colors py-2"
+              >
+                DASHBOARD
+              </a>
+            )}
+            <div className="pt-2"></div>
           </div>
         )}
       </div>
