@@ -65,14 +65,18 @@ const ConnectButton = () => {
   }, [address, user, isConnected, login, logout, isAuthenticating]);
 
   if (address && isConnected) {
-    return <AppKitAccountButton />;
+    return (
+      <div className="w-full sm:w-auto">
+        <AppKitAccountButton />
+      </div>
+    );
   }
 
   return (
     <Button
       onClick={() => open()}
       variant={"outline"}
-      className="rounded-full bg-card text-card-foreground border-border hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
+      className="w-full sm:w-auto rounded-full bg-card text-card-foreground border-border hover:bg-primary hover:text-primary-foreground transition-colors duration-300"
       disabled={isAuthenticating}
     >
       {isAuthenticating ? "Connecting..." : "Connect"}

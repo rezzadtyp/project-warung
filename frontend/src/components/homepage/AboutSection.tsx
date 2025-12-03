@@ -7,7 +7,7 @@ const AboutSection = () => {
         "Merchants create a unique QR code for seamless payment collection with instant currency conversion rates.",
       icon: (
         <svg
-          className="w-10 h-10"
+          className="w-8 h-8 sm:w-10 sm:h-10"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -28,7 +28,7 @@ const AboutSection = () => {
         "Customers simply scan the QR code with their mobile wallet to view payment details and current exchange rates.",
       icon: (
         <svg
-          className="w-10 h-10"
+          className="w-8 h-8 sm:w-10 sm:h-10"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -49,7 +49,7 @@ const AboutSection = () => {
         "Foreign currency is automatically converted to USDT in milliseconds. Users confirm and complete the payment securely.",
       icon: (
         <svg
-          className="w-10 h-10"
+          className="w-8 h-8 sm:w-10 sm:h-10"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -70,7 +70,7 @@ const AboutSection = () => {
         "Merchants receive USDT instantly and can view complete transaction history with detailed records and analytics.",
       icon: (
         <svg
-          className="w-10 h-10"
+          className="w-8 h-8 sm:w-10 sm:h-10"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -87,45 +87,48 @@ const AboutSection = () => {
   ];
 
   return (
-    <section id="docs" className="min-h-screen bg-background py-28 px-6">
+    <section
+      id="docs"
+      className="bg-background py-12 sm:py-20 lg:py-28 px-4 sm:px-6"
+    >
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
-        <div className="text-center mb-32 space-y-6">
-          <div className="inline-block mb-4">
-            <p className="text-muted-foreground text-sm uppercase tracking-widest font-medium">
+        <div className="text-center mb-12 sm:mb-24 lg:mb-32 space-y-4 sm:space-y-6">
+          <div className="inline-block mb-3 sm:mb-4">
+            <p className="text-muted-foreground text-xs sm:text-sm uppercase tracking-widest font-medium">
               Process
             </p>
             <div className="mx-auto mt-2 w-8 h-px bg-border" />
           </div>
 
-          <h2 className="text-6xl md:text-8xl font-serif text-card-foreground leading-tight font-extralight tracking-tight">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-serif text-card-foreground leading-tight font-extralight tracking-tight px-4">
             How It
-            <span className="relative inline-block ml-4">
+            <span className="relative inline-block ml-2 sm:ml-4">
               <span className="italic font-normal">Works</span>
               <span
-                className="absolute -bottom-3 left-0 w-full h-px bg-border origin-left
+                className="absolute -bottom-2 sm:-bottom-3 left-0 w-full h-px bg-border origin-left
                 transform scale-x-0 hover:scale-x-100 transition-transform duration-700"
               />
             </span>
           </h2>
 
-          <p className="text-muted-foreground text-xl max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="text-muted-foreground text-base sm:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed font-light px-4">
             Seamless cross-border payments in four simple steps. Fast, secure,
             and transparent.
           </p>
         </div>
 
         {/* Steps */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
           {steps.map((step, index) => (
             <div
               key={index}
-              className="relative group bg-card border border-border rounded-3xl p-12 
+              className="relative group bg-card border border-border rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 
               transition-all duration-700 hover:border-primary hover:shadow-xl"
             >
               {/* Number & Icon */}
-              <div className="flex items-start justify-between mb-10">
-                <span className="text-4xl font-extralight text-muted-foreground">
+              <div className="flex items-start justify-between mb-6 sm:mb-8 lg:mb-10">
+                <span className="text-3xl sm:text-4xl font-extralight text-muted-foreground">
                   {step.number}
                 </span>
                 <div className="text-muted-foreground group-hover:text-primary transition-colors">
@@ -133,23 +136,23 @@ const AboutSection = () => {
                 </div>
               </div>
 
-              <h3 className="text-3xl font-light text-card-foreground tracking-tight mb-6">
+              <h3 className="text-2xl sm:text-3xl font-light text-card-foreground tracking-tight mb-4 sm:mb-6">
                 {step.title}
               </h3>
 
-              <p className="text-muted-foreground text-lg leading-relaxed font-light mb-10">
+              <p className="text-muted-foreground text-base sm:text-lg leading-relaxed font-light mb-6 sm:mb-8 lg:mb-10">
                 {step.description}
               </p>
 
               {/* Preview Box */}
               <div
-                className="relative w-full h-56 bg-card border border-border rounded-xl 
+                className="relative w-full h-40 sm:h-48 lg:h-56 bg-card border border-border rounded-xl 
                 flex items-center justify-center transition-colors duration-500"
               >
-                <div className="text-center space-y-4">
-                  <div className="w-20 h-20 mx-auto bg-card rounded-xl flex items-center justify-center">
+                <div className="text-center space-y-3 sm:space-y-4">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-card rounded-xl flex items-center justify-center">
                     <svg
-                      className="w-10 h-10 text-muted-foreground"
+                      className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
