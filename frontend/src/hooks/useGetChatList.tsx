@@ -1,4 +1,4 @@
-import { getChats } from "@/api/chat/chat";
+import { getChats } from "@/api/chat/get";
 import type {
   ChatItem,
   ChatListResponse,
