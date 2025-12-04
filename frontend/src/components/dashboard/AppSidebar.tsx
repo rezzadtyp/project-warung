@@ -15,7 +15,8 @@ import { useSidebar } from "../utils/useSidebar";
 
 import { useNavigate } from "react-router-dom";
 
-import type { Chat, UserRole } from "@/lib/types";
+import type { ChatItem } from "@/lib/types/chat";
+import type { UserRole } from "@/lib/types";
 import { MessageSquare, PanelLeft, Plus, QrCode, Receipt } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "../shared/ThemeToggle";
@@ -23,7 +24,7 @@ import { ThemeToggle } from "../shared/ThemeToggle";
 interface AppSidebarProps {
   role: UserRole;
   walletAddress: string;
-  chats?: Chat[];
+  chats?: ChatItem[];
 }
 
 interface MenuItem {
@@ -43,7 +44,12 @@ export function AppSidebar({
   const navigate = useNavigate();
 
   const merchantMenuItems: MenuItem[] = [
-    { icon: Plus, label: "New Chat", path: "/dashboard/chat", action: true },
+    {
+      icon: Plus,
+      label: "New Chat",
+      path: "/dashboard/chat/new",
+      action: true,
+    },
     { icon: MessageSquare, label: "Chats", path: "/dashboard/chat" },
     { icon: QrCode, label: "QR Code", path: "/dashboard/qr" },
     { icon: Receipt, label: "Transactions", path: "/dashboard/transactions" },
@@ -145,18 +151,18 @@ export function AppSidebar({
             </div>
             <SidebarGroupContent>
               <SidebarMenu>
-                {chats.map((chat) => (
+                {chats.slice(0, 5).map((chat) => (
                   <SidebarMenuItem key={chat.id}>
                     <SidebarMenuButton
                       asChild
                       className="h-auto rounded-lg p-2 sm:p-3 text-left hover:bg-accent transition-colors flex-col items-start"
                     >
                       <Link to={`/dashboard/chat/${chat.id}`}>
-                        <span className="text-xs sm:text-sm font-medium">
-                          {chat.title}
+                        <span className="text-xs sm:text-sm font-medium truncate w-full">
+                          {chat.title || "Untitled Chat"}
                         </span>
-                        <span className="text-[10px] sm:text-xs text-muted-foreground">
-                          {chat.preview}
+                        <span className="text-[10px] sm:text-xs text-muted-foreground truncate w-full">
+                          {new Date(chat.updatedAt).toLocaleDateString()}
                         </span>
                       </Link>
                     </SidebarMenuButton>

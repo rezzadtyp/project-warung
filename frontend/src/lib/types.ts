@@ -1,12 +1,5 @@
 export type UserRole = 'merchant' | 'user';
 
-export interface Chat {
-  id: string;
-  title: string;
-  preview: string;
-  createdAt: Date;
-}
-
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
