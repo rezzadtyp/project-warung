@@ -4,95 +4,32 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Message } from "@/lib/types";
 import { CornerDownLeft, Menu, Mic, MicOff, Sparkles } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useSidebar } from "../utils/useSidebar";
 
 interface ChatAreaProps {
   chatId: string | null;
-  messages?: Message[];
-  onSendMessage?: (content: string) => void;
+  messages: Message[];
+  input: string;
+  isListening: boolean;
+  onInputChange: (value: string) => void;
+  onSendMessage: () => void;
+  onToggleSpeechRecognition: () => void;
+  onToggleSidebar: () => void;
 }
-
-const useMobileViewport = () => {
-  useEffect(() => {
-    const setHeight = () => {
-      const vh = window.visualViewport?.height || window.innerHeight;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-      document.body.style.height = `${vh}px`;
-    };
-
-    setHeight();
-    window.visualViewport?.addEventListener("resize", setHeight);
-    window.addEventListener("orientationchange", setHeight);
-
-    return () => {
-      window.visualViewport?.removeEventListener("resize", setHeight);
-      window.removeEventListener("orientationchange", setHeight);
-    };
-  }, []);
-};
 
 export function ChatArea({
   chatId,
-  messages: initialMessages = [],
+  messages,
+  input,
+  isListening,
+  onInputChange,
   onSendMessage,
+  onToggleSpeechRecognition,
+  onToggleSidebar,
 }: ChatAreaProps) {
-  const [input, setInput] = useState("");
-  const [isListening, setIsListening] = useState(false);
-  const { toggleSidebar } = useSidebar();
-
-  // Derive messages state from chatId changes - no setState in useEffect needed
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [currentChatId, setCurrentChatId] = useState<string | null>(chatId);
-
-  // Reset messages when chatId changes (using a key-based approach)
-  if (currentChatId !== chatId) {
-    setCurrentChatId(chatId);
-    setMessages(chatId ? initialMessages : []);
-
-    // TODO: When your friend implements socket/getMessage,
-    // trigger fetch here based on chatId
-    if (chatId) {
-      console.log("ChatArea loaded for chatId:", chatId);
-      // fetchMessages(chatId).then(setMessages);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      onSendMessage();
     }
-  }
-
-  useMobileViewport();
-
-  const handleSend = () => {
-    if (!input.trim()) return;
-
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: input,
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, newMessage]);
-
-    // TODO: Replace with actual socket/API call
-    onSendMessage?.(input);
-
-    setInput("");
-
-    // Mock AI response for now
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content:
-          "This is a mock response. Your friend will implement the actual AI response via socket.",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-    }, 1000);
-  };
-
-  const toggleSpeechRecognition = () => {
-    setIsListening(!isListening);
-    // TODO: Implement actual speech recognition
   };
 
   return (
@@ -102,7 +39,7 @@ export function ChatArea({
         <Button
           variant="ghost"
           size="icon"
-          onClick={toggleSidebar}
+          onClick={onToggleSidebar}
           className="h-8 w-8"
         >
           <Menu className="h-5 w-5" />
@@ -185,7 +122,7 @@ export function ChatArea({
                   ? "bg-destructive/20 text-destructive"
                   : "hover:bg-muted"
               }`}
-              onClick={toggleSpeechRecognition}
+              onClick={onToggleSpeechRecognition}
             >
               {isListening ? (
                 <MicOff className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -197,8 +134,8 @@ export function ChatArea({
             {/* Input - CRITICAL FIX: 16px on mobile */}
             <Input
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
+              onChange={(e) => onInputChange(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="Type your message..."
               className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 px-1 sm:px-2 py-1 text-base sm:text-sm"
             />
@@ -207,7 +144,7 @@ export function ChatArea({
             <Button
               size="icon"
               className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-primary hover:bg-primary/80 transition-all flex-shrink-0"
-              onClick={handleSend}
+              onClick={onSendMessage}
             >
               <CornerDownLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-foreground" />
             </Button>

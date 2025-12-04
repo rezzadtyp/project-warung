@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useChats } from "@/hooks/useGetChatList";
+import type { ChatItem } from "@/lib/types/chat";
 import { formatDistanceToNow } from "date-fns";
 import {
   Loader2,
@@ -18,70 +18,28 @@ import {
   Plus,
   Search,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSidebar } from "../utils/useSidebar";
 
-const useMobileViewport = () => {
-  useEffect(() => {
-    const setHeight = () => {
-      const vh = window.visualViewport?.height || window.innerHeight;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-      document.body.style.height = `${vh}px`;
-    };
+interface ChatListProps {
+  chats: ChatItem[];
+  loading: boolean;
+  searchTerm: string;
+  onSearchChange: (value: string) => void;
+  onCreateNew: () => void;
+  onChatClick: (chatId: string) => void;
+  onDeleteChat: (chatId: string, e: React.MouseEvent) => void;
+  onToggleSidebar: () => void;
+}
 
-    setHeight();
-    window.visualViewport?.addEventListener("resize", setHeight);
-    window.addEventListener("orientationchange", setHeight);
-
-    return () => {
-      window.visualViewport?.removeEventListener("resize", setHeight);
-      window.removeEventListener("orientationchange", setHeight);
-    };
-  }, []);
-};
-
-export function ChatList() {
-  const navigate = useNavigate();
-  const { toggleSidebar } = useSidebar();
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // Use the hook you provided
-  const {
-    data: chats,
-    loading,
-    updateParams,
-  } = useChats({
-    page: 1,
-    take: 20,
-  });
-
-  useMobileViewport();
-
-  // Debounce search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchTerm) {
-        updateParams({ search: searchTerm, page: 1 });
-      } else {
-        updateParams({ search: undefined, page: 1 });
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm, updateParams]);
-
-  const handleCreateNew = () => {
-    navigate("/dashboard/chat/new");
-  };
-
-  const handleDeleteChat = (chatId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    // TODO: Implement delete functionality
-    console.log("Delete chat:", chatId);
-    // After successful delete, call refetch() to update the list
-  };
-
+export function ChatList({
+  chats,
+  loading,
+  searchTerm,
+  onSearchChange,
+  onCreateNew,
+  onChatClick,
+  onDeleteChat,
+  onToggleSidebar,
+}: ChatListProps) {
   return (
     <div className="flex h-full flex-col bg-background">
       {/* Header */}
@@ -90,7 +48,7 @@ export function ChatList() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={toggleSidebar}
+            onClick={onToggleSidebar}
             className="lg:hidden h-8 w-8 -ml-2"
           >
             <Menu className="h-5 w-5" />
@@ -98,7 +56,7 @@ export function ChatList() {
           <span className="text-sm font-medium">Conversations</span>
         </div>
         <Button
-          onClick={handleCreateNew}
+          onClick={onCreateNew}
           size="sm"
           className="h-8 rounded-full px-4 text-xs font-medium gap-1.5"
         >
@@ -113,7 +71,7 @@ export function ChatList() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search conversations..."
             className="pl-9 h-9 text-sm bg-card border-border/60 focus-visible:ring-1"
           />
@@ -145,7 +103,7 @@ export function ChatList() {
             chats.map((chat) => (
               <div
                 key={chat.id}
-                onClick={() => navigate(`/dashboard/chat/${chat.id}`)}
+                onClick={() => onChatClick(chat.id)}
                 className="
                   group relative flex items-start gap-3 sm:gap-4 p-3 sm:p-4 
                   rounded-xl border border-border bg-card 
@@ -193,14 +151,12 @@ export function ChatList() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => navigate(`/dashboard/chat/${chat.id}`)}
-                      >
+                      <DropdownMenuItem onClick={() => onChatClick(chat.id)}>
                         Open Chat
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className="text-destructive focus:text-destructive"
-                        onClick={(e) => handleDeleteChat(chat.id, e)}
+                        onClick={(e) => onDeleteChat(chat.id, e)}
                       >
                         Delete Chat
                       </DropdownMenuItem>

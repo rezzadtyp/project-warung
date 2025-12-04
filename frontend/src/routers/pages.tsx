@@ -8,11 +8,13 @@ export const IndexLayout = Loadable(
 export const DashboardLayout = Loadable(
   lazy(() => import("@/layouts/DashboardLayout"))
 );
-export const ChatListPage = Loadable(
-  lazy(() => import("@/pages/dashboard/ChatListPage"))
+export const ChatListPage = lazy(
+  () => import("@/pages/dashboard/ChatListPage")
 );
 
-export const ChatAreaPage = Loadable(lazy(()=> import("@/pages/dashboard/ChatAreaPage")))
+export const ChatAreaPage = Loadable(
+  lazy(() => import("@/pages/dashboard/ChatAreaPage"))
+);
 export const QRPage = Loadable(lazy(() => import("@/pages/dashboard/QRPage")));
 export const TransactionsPage = Loadable(
   lazy(() => import("@/pages/dashboard/TransactionsPage"))
