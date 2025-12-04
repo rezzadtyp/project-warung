@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { getChats } from "@/api/chat/chat";
 import type {
   ChatItem,
   ChatListResponse,
   GetChatsParams,
 } from "@/lib/types/chat";
-import { getChats } from "@/api/chat/chat";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useChats = (initialParams: GetChatsParams = {}) => {
   const [data, setData] = useState<ChatItem[]>([]);
@@ -19,6 +19,9 @@ export const useChats = (initialParams: GetChatsParams = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<unknown>(null);
 
+  // Use ref to track if initial fetch has been done
+  const hasFetchedRef = useRef(false);
+
   const fetchChats = useCallback(async () => {
     try {
       setLoading(true);
@@ -26,6 +29,7 @@ export const useChats = (initialParams: GetChatsParams = {}) => {
       const res = await getChats(params);
       setData(res.data);
       setMeta(res.meta);
+      hasFetchedRef.current = true;
     } catch (error) {
       setError(error);
     } finally {
@@ -37,12 +41,13 @@ export const useChats = (initialParams: GetChatsParams = {}) => {
     fetchChats();
   }, [fetchChats]);
 
-  const updateParams = (newParams: Partial<GetChatsParams>) => {
+  // Memoize updateParams to prevent unnecessary re-renders
+  const updateParams = useCallback((newParams: Partial<GetChatsParams>) => {
     setParams((prev) => ({
       ...prev,
       ...newParams,
     }));
-  };
+  }, []);
 
   return {
     data,
