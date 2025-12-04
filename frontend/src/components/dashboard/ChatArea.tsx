@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { useSidebar } from "../utils/useSidebar";
 
 interface ChatAreaProps {
+  chatId: string | null;
   messages?: Message[];
   onSendMessage?: (content: string) => void;
 }
@@ -32,13 +33,30 @@ const useMobileViewport = () => {
 };
 
 export function ChatArea({
+  chatId,
   messages: initialMessages = [],
   onSendMessage,
 }: ChatAreaProps) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isListening, setIsListening] = useState(false);
   const { toggleSidebar } = useSidebar();
+
+  // Derive messages state from chatId changes - no setState in useEffect needed
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [currentChatId, setCurrentChatId] = useState<string | null>(chatId);
+
+  // Reset messages when chatId changes (using a key-based approach)
+  if (currentChatId !== chatId) {
+    setCurrentChatId(chatId);
+    setMessages(chatId ? initialMessages : []);
+
+    // TODO: When your friend implements socket/getMessage,
+    // trigger fetch here based on chatId
+    if (chatId) {
+      console.log("ChatArea loaded for chatId:", chatId);
+      // fetchMessages(chatId).then(setMessages);
+    }
+  }
 
   useMobileViewport();
 
@@ -52,13 +70,29 @@ export function ChatArea({
       timestamp: new Date(),
     };
 
-    setMessages([...messages, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
+
+    // TODO: Replace with actual socket/API call
     onSendMessage?.(input);
+
     setInput("");
+
+    // Mock AI response for now
+    setTimeout(() => {
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content:
+          "This is a mock response. Your friend will implement the actual AI response via socket.",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, aiMessage]);
+    }, 1000);
   };
 
   const toggleSpeechRecognition = () => {
     setIsListening(!isListening);
+    // TODO: Implement actual speech recognition
   };
 
   return (
@@ -73,7 +107,9 @@ export function ChatArea({
         >
           <Menu className="h-5 w-5" />
         </Button>
-        <span className="text-sm font-medium">Chat</span>
+        <span className="text-sm font-medium">
+          {chatId ? "Chat" : "New Chat"}
+        </span>
         <div className="w-8" /> {/* Spacer for centering */}
       </div>
 

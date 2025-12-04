@@ -1,9 +1,10 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import {
-  DashboardPage,
   IndexLayout,
   IndexPage,
   DashboardLayout,
+  ChatAreaPage,
+  ChatListPage,
   QRPage,
   TransactionsPage,
 } from "./pages";
@@ -25,11 +26,19 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/dashboard/chat" replace />,
+        element: <Navigate to="/dashboard/chat/new" replace />,
       },
       {
         path: "chat",
-        element: <DashboardPage />,
+        element: <ChatListPage />,
+      },
+      {
+        path: "chat/new",
+        element: <ChatAreaPage />,
+      },
+      {
+        path: "chat/:chatId",
+        element: <ChatAreaPage />,
       },
       {
         path: "qr",
