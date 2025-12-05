@@ -1,0 +1,25 @@
+{
+  "name": "imphnen-hackaton",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/rezzadtyp/project-warung#readme",
+  "bugs": {
+    "url": "https://github.com/rezzadtyp/project-warung/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rezzadtyp/project-warung.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "cd backend && npm run dev",
+    "web": "cd frontend && npm run dev"
+  },
+  "dependencies": {
+    "qrcode.react": "^4.2.0"
+  }
+}

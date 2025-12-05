@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Camera, Download, Menu, QrCode, Share2 } from "lucide-react";
+import { Download, Menu, QrCode, Share2 } from "lucide-react";
 import { useSidebar } from "../utils/useSidebar";
 
 export function QRSection() {
@@ -24,16 +24,17 @@ export function QRSection() {
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
         <div className="text-center w-full max-w-md">
           {/* QR Container */}
-          <div className="mx-auto mb-6 sm:mb-8 h-48 w-48 sm:h-64 sm:w-64 rounded-2xl sm:rounded-3xl bg-card border border-border flex items-center justify-center shadow-inner">
-            <div className="relative">
+          <div className="mx-auto mb-6 sm:mb-8 w-48 h-48 sm:w-64 sm:h-64 rounded-2xl sm:rounded-3xl bg-card border border-border flex items-center justify-center shadow-inner overflow-hidden">
+            <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
+              {/* <ScanQR onScan={(result) => console.log(result)} /> */}
               <QrCode className="h-24 w-24 sm:h-32 sm:w-32 text-muted-foreground" />
 
               {/* Middle Camera Icon */}
-              <div className="absolute inset-0 flex items-center justify-center">
+              {/* <div className="absolute inset-0 flex items-center justify-center">
                 <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg sm:rounded-xl bg-background border border-border flex items-center justify-center">
                   <Camera className="h-5 w-5 sm:h-6 sm:w-6 text-card-foreground" />
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 

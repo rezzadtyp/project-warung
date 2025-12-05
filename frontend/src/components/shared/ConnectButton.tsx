@@ -1,11 +1,11 @@
-import {
-  AppKitAccountButton,
-  useAppKit,
-  useAppKitAccount,
-} from "@reown/appkit/react";
-import { Button } from "../ui/button";
 import { useAuth } from "@/providers/AuthProvider";
+import {
+  AppKitButton,
+  useAppKit,
+  useAppKitAccount
+} from "@reown/appkit/react";
 import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
 
 const ConnectButton = () => {
   const { open } = useAppKit();
@@ -67,7 +67,7 @@ const ConnectButton = () => {
   if (address && isConnected) {
     return (
       <div className="w-full sm:w-auto">
-        <AppKitAccountButton />
+        <AppKitButton />
       </div>
     );
   }

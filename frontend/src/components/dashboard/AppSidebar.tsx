@@ -81,7 +81,7 @@ export function AppSidebar({
             onClick={() => navigate("/")}
           >
             <img
-              src="src/assets/icon.svg"
+              src="/icon.svg"
               alt="Warung AI Logo"
               className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl"
             />
