@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { AppKitProvider } from "./providers/AppKitProvider.tsx";
 import { ThemeProvider } from "./providers/ThemeProvider.tsx";
+import 'regenerator-runtime';
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

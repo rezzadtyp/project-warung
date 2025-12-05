@@ -4,16 +4,31 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import { ThemeToggle } from "./ThemeToggle";
-import { useState } from "react";
 import { useAuth } from "@/providers/AuthProvider";
+import { useTheme } from "@/utils/themeUtils";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ThemeToggle } from "./ThemeToggle";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
+  // Detect system theme
+  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+
+  // Final theme value
+  const currentTheme = theme === "system" ? systemTheme : theme;
+
+  // Logo path
+  const logoSrc =
+    currentTheme === "dark"
+      ? "/src/assets/warung-white.svg"
+      : "/src/assets/warung-black.svg";
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]/80 backdrop-blur-sm border-b border-[var(--border)]">
       <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
@@ -21,7 +36,7 @@ const Navbar = () => {
           {/* Logo */}
           <a href="#hero" className="flex items-center gap-2">
             <img
-              src="src/assets/icon.svg"
+              src={logoSrc}
               alt="Warung AI Logo"
               className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl"
             />
@@ -137,6 +152,7 @@ const Navbar = () => {
               </a>
             )}
             <div className="pt-2"></div>
+            <ThemeToggle/>
           </div>
         )}
       </div>
