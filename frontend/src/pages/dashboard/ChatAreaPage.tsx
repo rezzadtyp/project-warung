@@ -1,9 +1,12 @@
 import { ChatArea } from "@/components/dashboard/ChatArea";
 import type { Message } from "@/lib/types";
+import { SUPPORTED_LANGUAGES } from "@/lib/types/languages";
+import type { SupportedLanguage } from "@/lib/types/languages";
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useSidebar } from "@/components/utils/useSidebar";
 import { useMobileViewport } from "@/hooks/useMobileViewport";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 
 export default function ChatAreaPage() {
   const { chatId } = useParams();
@@ -28,8 +31,25 @@ function ChatAreaWrapper({
   toggleSidebar: () => void;
 }) {
   const [input, setInput] = useState("");
-  const [isListening, setIsListening] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+
+  const handleTranscriptChange = useCallback((transcript: string) => {
+    setInput(transcript);
+  }, []);
+
+  const {
+    listening,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
+    currentLanguage,
+    toggleListening,
+    changeLanguage,
+    resetTranscript,
+  } = useSpeechRecognition({
+    onTranscriptChange: handleTranscriptChange,
+    continuous: false,
+    language: "auto", // Start with auto-detect
+  });
 
   const handleSendMessage = () => {
     if (!input.trim()) return;
@@ -43,12 +63,10 @@ function ChatAreaWrapper({
 
     setMessages((prev) => [...prev, newMessage]);
 
-    // TODO: Replace with actual socket/API call
-    // onSendMessage?.(input);
-
     setInput("");
+    resetTranscript();
 
-    // Mock AI response for now
+    // Mock AI response
     setTimeout(() => {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -61,20 +79,42 @@ function ChatAreaWrapper({
     }, 1000);
   };
 
-  const handleToggleSpeechRecognition = () => {
-    setIsListening(!isListening);
-    // TODO: Implement actual speech recognition
+  const handleToggleSpeechRecognition = async () => {
+    if (!browserSupportsSpeechRecognition) {
+      console.error("Browser doesn't support speech recognition");
+      return;
+    }
+
+    if (!isMicrophoneAvailable && !listening) {
+      console.error("Microphone is not available");
+      return;
+    }
+
+    await toggleListening(currentLanguage);
   };
+
+  const handleLanguageChange = (language: SupportedLanguage) => {
+    changeLanguage(language);
+  };
+
+  if (!browserSupportsSpeechRecognition) {
+    console.warn(
+      "Browser doesn't support speech recognition. Voice input will be disabled."
+    );
+  }
 
   return (
     <ChatArea
       chatId={chatId ?? null}
       messages={messages}
       input={input}
-      isListening={isListening}
+      isListening={listening}
+      currentLanguage={currentLanguage}
+      supportedLanguages={SUPPORTED_LANGUAGES}
       onInputChange={setInput}
       onSendMessage={handleSendMessage}
       onToggleSpeechRecognition={handleToggleSpeechRecognition}
+      onLanguageChange={handleLanguageChange}
       onToggleSidebar={toggleSidebar}
     />
   );

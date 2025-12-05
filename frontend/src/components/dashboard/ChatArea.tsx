@@ -1,18 +1,34 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Message } from "@/lib/types";
-import { CornerDownLeft, Menu, Mic, MicOff, Sparkles } from "lucide-react";
+import type { LanguageOption, SupportedLanguage } from "@/lib/types/languages";
+import {
+  CornerDownLeft,
+  Menu,
+  Mic,
+  MicOff,
+  Sparkles
+} from "lucide-react";
 
 interface ChatAreaProps {
   chatId: string | null;
   messages: Message[];
   input: string;
   isListening: boolean;
+  currentLanguage: SupportedLanguage;
+  supportedLanguages: LanguageOption[];
   onInputChange: (value: string) => void;
   onSendMessage: () => void;
   onToggleSpeechRecognition: () => void;
+  onLanguageChange: (language: SupportedLanguage) => void;
   onToggleSidebar: () => void;
 }
 
@@ -21,9 +37,12 @@ export function ChatArea({
   messages,
   input,
   isListening,
+  currentLanguage,
+  supportedLanguages,
   onInputChange,
   onSendMessage,
   onToggleSpeechRecognition,
+  onLanguageChange,
   onToggleSidebar,
 }: ChatAreaProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -31,6 +50,10 @@ export function ChatArea({
       onSendMessage();
     }
   };
+
+  const currentLangOption = supportedLanguages.find(
+    (l) => l.code === currentLanguage
+  );
 
   return (
     <div className="flex h-full flex-col bg-background">
@@ -47,7 +70,7 @@ export function ChatArea({
         <span className="text-sm font-medium">
           {chatId ? "Chat" : "New Chat"}
         </span>
-        <div className="w-8" /> {/* Spacer for centering */}
+        <div className="w-8" />
       </div>
 
       {/* Messages */}
@@ -113,6 +136,32 @@ export function ChatArea({
       <div className="border-t border-border bg-background/80 backdrop-blur-sm px-3 sm:px-4 py-3 sm:py-4">
         <div className="mx-auto max-w-3xl">
           <div className="flex items-center gap-1.5 sm:gap-2 rounded-full border border-border bg-card px-2 sm:px-3 py-1.5 sm:py-2 shadow-sm">
+            {/* Language Selector */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 sm:h-8 sm:w-8 rounded-full hover:bg-muted flex-shrink-0"
+                >
+                  <span className="text-sm">{currentLangOption?.flag}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                {supportedLanguages.map((lang) => (
+                  <DropdownMenuItem
+                    key={lang.code}
+                    onClick={() => onLanguageChange(lang.code)}
+                    className="gap-2"
+                  >
+                    <span>{lang.flag}</span>
+                    <span>{lang.label}</span>
+                    {currentLanguage === lang.code && <span>✓</span>}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* Mic Button */}
             <Button
               variant="ghost"
@@ -131,7 +180,7 @@ export function ChatArea({
               )}
             </Button>
 
-            {/* Input - CRITICAL FIX: 16px on mobile */}
+            {/* Input */}
             <Input
               value={input}
               onChange={(e) => onInputChange(e.target.value)}
@@ -151,7 +200,9 @@ export function ChatArea({
           </div>
 
           <p className="mt-1.5 sm:mt-2 text-center text-[10px] sm:text-xs text-muted-foreground">
-            {isListening ? "Listening..." : "Press microphone for voice input"}
+            {isListening
+              ? `Listening in ${currentLangOption?.label}...`
+              : "Press microphone for voice input"}
           </p>
         </div>
       </div>
