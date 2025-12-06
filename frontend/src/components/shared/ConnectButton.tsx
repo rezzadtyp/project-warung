@@ -66,7 +66,7 @@ const ConnectButton = () => {
 
   if (address && isConnected) {
     return (
-      <div className="w-full sm:w-auto">
+      <div className="w-fit sm:w-auto">
         <AppKitButton />
       </div>
     );

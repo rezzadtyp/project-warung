@@ -7,6 +7,7 @@ import {
   ChatListPage,
   QRPage,
   TransactionsPage,
+  TenantEarningsPage,
 } from "./pages";
 
 const router = createBrowserRouter([
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "transactions",
         element: <TransactionsPage />,
+      },
+      {
+        path: "earnings",
+        element: <TenantEarningsPage />,
       },
     ],
   },

@@ -7,10 +7,14 @@ interface ScanQRProps {
 const ScanQR = ({ onScan }: ScanQRProps) => {
   const delay = 500;
 
-  const handleScan = (result: string | null) => {
+  const handleScan = (result: string | null | { data?: string }) => {
     if (result) {
-      console.log("Scanned QR Code:", result);
-      onScan?.(result);
+      // Handle both string and object formats
+      const dataString = typeof result === "string" ? result : result.data;
+      if (dataString) {
+        console.log("Scanned QR Code:", dataString);
+        onScan?.(dataString);
+      }
     }
   };
 
@@ -20,15 +24,13 @@ const ScanQR = ({ onScan }: ScanQRProps) => {
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center overflow-hidden">
-      <div 
-        className="w-full h-full relative flex items-center justify-center overflow-hidden"
-      >
+      <div className="w-full h-full relative flex items-center justify-center overflow-hidden">
         <QrReader
           delay={delay}
           style={{
             height: "100%",
             width: "100%",
-            objectFit: "contain"
+            objectFit: "contain",
           }}
           onError={handleError}
           onScan={handleScan}

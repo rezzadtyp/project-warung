@@ -17,6 +17,7 @@ import { chat } from "./openai/chat";
 import chatRouter from "./routers/chat.router";
 import authRouter from "./routers/auth.router";
 import txRouter from "./routers/tx.router";
+import settlementRouter from "./routers/settlement.router";
 
 const app = express();
 export const server = http.createServer(app);
@@ -48,6 +49,7 @@ app.get("/health", (req: Request, res: Response) => {
 app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/tx", txRouter);
+app.use("/api/v1/settlement", settlementRouter);
 
 io.on("connection", (socket) => {
   socket.on("message", async (message) => {

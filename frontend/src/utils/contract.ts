@@ -39,6 +39,9 @@ export function useUSDTBalance(account?: Address) {
     args: targetAddress ? [targetAddress] : undefined,
     query: {
       enabled: !!targetAddress,
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
+      refetchInterval: 10000, // Refetch every 10 seconds
     },
   });
 }
@@ -132,6 +135,21 @@ export function useGetTokenEquivalentFromRupiah(token: Address, rupiahAmount: st
 }
 
 /**
+ * Get oracle rate for a token
+ */
+export function useGetOracleRate(token: Address) {
+  return useReadContract({
+    address: CONTRACTS.ORACLE_HUB as Address,
+    abi: abiData.ORACLE_ABI,
+    functionName: "getRate",
+    args: [token],
+    query: {
+      enabled: !!token,
+    },
+  });
+}
+
+/**
  * QR Payment Contract Hooks
  */
 
@@ -198,6 +216,65 @@ export function useGetOrderHash(orderData: OrderData) {
 }
 
 /**
+ * Get payment info by order hash
+ */
+export function useGetPaymentInfo(orderHash: `0x${string}` | undefined) {
+  return useReadContract({
+    address: CONTRACTS.QR_PAYMENT as Address,
+    abi: abiData.QR_PAYMENT_ABI,
+    functionName: "getPaymentInfo",
+    args: orderHash ? [orderHash] : undefined,
+    query: {
+      enabled: !!orderHash,
+    },
+  });
+}
+
+/**
+ * Settle QR order (ERC20)
+ */
+export function useSettleQROrder(beneficiary: Address, orderHash: `0x${string}` | undefined) {
+  const { writeContract, data: hash, isPending, error } = useWriteContract();
+
+  const settle = () => {
+    if (!orderHash) return;
+    writeContract({
+      address: CONTRACTS.QR_PAYMENT as Address,
+      abi: abiData.QR_PAYMENT_ABI,
+      functionName: "settleQROrder",
+      args: [beneficiary, orderHash],
+    });
+  };
+
+  return {
+    settle,
+    hash,
+    isPending,
+    error,
+  };
+}
+
+/**
+ * Settle QR order with wait
+ */
+export function useSettleQROrderWithWait(beneficiary: Address, orderHash: `0x${string}` | undefined) {
+  const { settle, hash, isPending, error } = useSettleQROrder(beneficiary, orderHash);
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash,
+    });
+
+  return {
+    settle,
+    hash,
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+  };
+}
+
+/**
  * Utility Functions
  */
 
@@ -213,6 +290,20 @@ export function formatTokenAmount(amount: bigint, decimals: number = 18): string
  */
 export function parseTokenAmount(amount: string, decimals: number = 18): bigint {
   return parseUnits(amount, decimals);
+}
+
+/**
+ * Format USDT amount (6 decimals)
+ */
+export function formatUSDT(amount: bigint): string {
+  return formatUnits(amount, 6);
+}
+
+/**
+ * Parse USDT amount (6 decimals)
+ */
+export function parseUSDT(amount: string): bigint {
+  return parseUnits(amount, 6);
 }
 
 /**

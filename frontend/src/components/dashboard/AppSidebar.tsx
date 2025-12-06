@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 
 import type { ChatItem } from "@/lib/types/chat";
 import type { UserRole } from "@/lib/types";
-import { MessageSquare, PanelLeft, Plus, QrCode, Receipt } from "lucide-react";
+import { MessageSquare, PanelLeft, Plus, QrCode, Receipt, Wallet } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "../shared/ThemeToggle";
 
@@ -53,6 +53,7 @@ export function AppSidebar({
     { icon: MessageSquare, label: "Chats", path: "/dashboard/chat" },
     { icon: QrCode, label: "QR Code", path: "/dashboard/qr" },
     { icon: Receipt, label: "Transactions", path: "/dashboard/transactions" },
+    { icon: Wallet, label: "Earnings", path: "/dashboard/earnings" },
   ];
 
   const userMenuItems: MenuItem[] = [

@@ -1,6 +1,28 @@
+import { formatUSDT, useUSDTBalance } from "@/utils/contract";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { useEffect } from "react";
+import type { Address } from "viem";
 import ConnectButton from "../shared/ConnectButton";
 
 const HeroSection = () => {
+  const { address } = useAppKitAccount();
+
+  const {
+    data: balance,
+    isLoading: isLoadingBalance,
+    refetch: refetchBalance,
+    error: balanceError,
+  } = useUSDTBalance(address as Address);
+
+  useEffect(() => {
+    if (address) {
+      const timer = setTimeout(() => {
+        refetchBalance();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [address, refetchBalance]);
+
   return (
     <section
       id="hero"
@@ -50,11 +72,11 @@ const HeroSection = () => {
               className="w-full h-full object-cover rounded-lg"
             />
 
-            <div className="absolute top-32 left-8 text-primary font-mono text-sm opacity-40 rotate-[-15deg]">
+            <div className="absolute top-32 left-8 text-primary font-mono text-sm opacity-40 rotate-15">
               )<span className="text-secondary">{` { ( ) > `}</span>-&lt;
             </div>
 
-            <div className="absolute bottom-40 right-12 text-primary font-mono text-sm opacity-40 rotate-[15deg]">
+            <div className="absolute bottom-40 right-12 text-primary font-mono text-sm opacity-40 rotate-15">
               {`- + : ) /`}
             </div>
           </div>
@@ -69,8 +91,25 @@ const HeroSection = () => {
           </div>
 
           <div className="w-full flex justify-center items-center">
-            <div className="w-full sm:w-auto sm:scale-110 transition-transform">
+            <div className="w-full sm:w-auto sm:scale-110 transition-transform items-center flex flex-col">
               <ConnectButton />
+              {address && !isLoadingBalance && balance !== undefined && (
+                <>
+                  <p className="text-sm text-foreground mt-2">
+                    Balance: {formatUSDT(balance as bigint)} USDT
+                  </p>
+                </>
+              )}
+              {address && isLoadingBalance && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Loading balance...
+                </p>
+              )}
+              {address && balanceError && (
+                <p className="text-sm text-red-500 mt-2">
+                  Error loading balance
+                </p>
+              )}
             </div>
           </div>
 

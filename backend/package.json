@@ -20,7 +20,8 @@
     "jsonwebtoken": "^9.0.2",
     "openai": "^6.9.1",
     "prisma": "^5.17.0",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "viem": "^2.41.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
