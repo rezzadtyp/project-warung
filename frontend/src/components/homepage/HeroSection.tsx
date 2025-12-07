@@ -97,7 +97,7 @@ const HeroSection = () => {
               initial={{ scale: 1.1 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              src="src/assets/hero.jpg"
+              src="/hero.jpg"
               alt="Hero"
               className="w-full h-full object-cover rounded-lg"
             />
