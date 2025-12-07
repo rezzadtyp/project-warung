@@ -1,4 +1,5 @@
-import { createWalletClient, http, type Address, type Chain } from "viem";
+import { createWalletClient, http, type Address } from "viem";
+import { sepolia } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
 import { appConfig } from "../../utils/config";
 
@@ -19,35 +20,6 @@ const SETTLE_QR_ORDER_ABI = [
 export interface SettleOrderParams {
   beneficiary: Address;
   orderHash: `0x${string}`;
-}
-
-// Define chain based on chainId
-const getChain = (chainId: number): Chain => {
-  // Common chain configurations
-  const chains: Record<number, Partial<Chain>> = {
-    1: { name: "Ethereum Mainnet" },
-    137: { name: "Polygon" },
-    56: { name: "BNB Smart Chain" },
-    31337: { name: "Localhost" },
-    11155111: { name: "Sepolia" },
-  };
-
-  const chainInfo = chains[chainId] || { name: "Unknown Chain" };
-
-  return {
-    id: chainId,
-    name: chainInfo.name || "Custom Chain",
-    nativeCurrency: {
-      name: "Ether",
-      symbol: "ETH",
-      decimals: 18,
-    },
-    rpcUrls: {
-      default: {
-        http: [appConfig.rpcUrl],
-      },
-    },
-  } as Chain;
 };
 
 export const settleOrderService = async (params: SettleOrderParams) => {
@@ -67,17 +39,18 @@ export const settleOrderService = async (params: SettleOrderParams) => {
 
     const account = privateKeyToAccount(privateKey as `0x${string}`);
 
-    // Get chain configuration
-    const chain = getChain(appConfig.chainId);
-
-    // Create wallet client
+    const rpcUrl = appConfig.rpcUrl && appConfig.rpcUrl !== "http://localhost:8545"
+      ? appConfig.rpcUrl
+      : "https://ethereum-sepolia-rpc.publicnode.com";
+    
     const walletClient = createWalletClient({
       account,
-      chain,
-      transport: http(appConfig.rpcUrl),
+      chain: sepolia,
+      transport: http(rpcUrl, {
+        timeout: 60000,
+      }),
     });
 
-    // Call settleQROrder
     const hash = await walletClient.writeContract({
       address: appConfig.qrPaymentAddress as Address,
       abi: SETTLE_QR_ORDER_ABI,

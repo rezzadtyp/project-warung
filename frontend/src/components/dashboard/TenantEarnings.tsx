@@ -54,7 +54,7 @@ export function TenantEarnings() {
     data: calculatedOrderHash,
     isLoading: isLoadingHash,
     refetch: refetchHash,
-  } = useGetOrderHash(orderData!);
+  } = useGetOrderHash(orderData);
 
   // Get payment info
   const {

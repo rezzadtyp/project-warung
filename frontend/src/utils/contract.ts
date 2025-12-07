@@ -199,19 +199,24 @@ export function usePayQRWithWait(params: PayQRParams) {
 /**
  * Get order hash
  */
-export function useGetOrderHash(orderData: OrderData) {
+export function useGetOrderHash(orderData: OrderData | undefined) {
   return useReadContract({
     address: CONTRACTS.QR_PAYMENT as Address,
     abi: abiData.QR_PAYMENT_ABI,
     functionName: "getOrderHash",
-    args: [
-      {
-        orderId: orderData.orderId,
-        referenceString: orderData.referenceString,
-        tokenAddress: orderData.tokenAddress,
-        creator: orderData.creator,
-      },
-    ],
+    args: orderData
+      ? [
+          {
+            orderId: orderData.orderId,
+            referenceString: orderData.referenceString,
+            tokenAddress: orderData.tokenAddress,
+            creator: orderData.creator,
+          },
+        ]
+      : undefined,
+    query: {
+      enabled: !!orderData,
+    },
   });
 }
 
