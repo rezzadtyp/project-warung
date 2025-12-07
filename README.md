@@ -128,9 +128,12 @@ Project ini masih dalam tahap development. Kontribusi dan feedback sangat diteri
 ---
 
 ## DOKUMENTASI DEMO
-- QR Payment <img width="1284" height="1337" alt="image" src="https://github.com/user-attachments/assets/f1e4a847-238e-46ff-9b36-3dcb32aa456c" />
-- Payment Successful <img width="450" height="547" alt="image" src="https://github.com/user-attachments/assets/b070fd7e-a106-482c-9b39-881d3a03fd1f" />
-- Payment Settled <img width="452" height="1246" alt="image" src="https://github.com/user-attachments/assets/961f77db-7560-46a3-bb45-2946addbc018" />
+- QR Payment
+  <img width="1284" height="1337" alt="image" src="https://github.com/user-attachments/assets/f1e4a847-238e-46ff-9b36-3dcb32aa456c" />
+- Payment Successful
+  <img width="450" height="547" alt="image" src="https://github.com/user-attachments/assets/b070fd7e-a106-482c-9b39-881d3a03fd1f" />
+- Payment Settled
+  <img width="452" height="1246" alt="image" src="https://github.com/user-attachments/assets/961f77db-7560-46a3-bb45-2946addbc018" />
 
 
 
