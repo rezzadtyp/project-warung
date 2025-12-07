@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { getChatsService } from "../services/chat/get-chats.service";
 import { getChatHistoryService } from "../services/chat/get-chat-history.service";
+import { deleteChatService } from "../services/chat/delete-chat.service";
 
 export const getChats = async (
   req: Request,
@@ -33,6 +34,20 @@ export const getChatHistory = async (
     const { chatId } = req.params;
     const history = await getChatHistoryService(req.user.id, chatId);
     res.status(200).send(history);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteChat = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { chatId } = req.params;
+    const chat = await deleteChatService(req.user.id, chatId);
+    res.status(200).send(chat);
   } catch (error) {
     next(error);
   }
