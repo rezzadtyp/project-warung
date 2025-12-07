@@ -11,14 +11,8 @@ const IndexPage = () => {
 
   const handleScan = (result: string) => {
     try {
-      console.log("Raw scan result:", result);
-      
-      // Parse the JSON string
       const data = JSON.parse(result) as QRPaymentData;
-      
-      // Validate the data structure
       if (data.orderId && data.rupiahAmount && data.tokenAddress && data.creator) {
-        console.log("Valid QR data:", data);
         setScannedData(data);
       } else {
         console.error("Invalid QR data structure:", data);

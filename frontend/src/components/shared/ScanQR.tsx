@@ -12,7 +12,6 @@ const ScanQR = ({ onScan }: ScanQRProps) => {
       // Handle both string and object formats
       const dataString = typeof result === "string" ? result : result.data;
       if (dataString) {
-        console.log("Scanned QR Code:", dataString);
         onScan?.(dataString);
       }
     }

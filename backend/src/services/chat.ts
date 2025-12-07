@@ -158,30 +158,58 @@ export class ChatService {
     client: OpenAI
   ): Promise<string> {
     try {
+      // Clean the message - remove extra whitespace
+      const cleanMessage = firstMessage.trim();
+      
+      // If message is very short (like "halo", "hi"), use it directly or a simple title
+      if (cleanMessage.length <= 20) {
+        // For very short messages, create a simple title
+        const lowerMessage = cleanMessage.toLowerCase();
+        if (lowerMessage === "halo" || lowerMessage === "hello" || lowerMessage === "hi") {
+          return "Greeting";
+        }
+        // For other short messages, use the message itself (capitalized) if it's reasonable
+        if (cleanMessage.length <= 15) {
+          return cleanMessage.charAt(0).toUpperCase() + cleanMessage.slice(1);
+        }
+      }
+
       const response = await client.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
             content:
-              "Generate a short, descriptive title (max 50 characters) for a healthcare chat conversation based on the user's first message. Return only the title, no quotes or extra text.",
+              "You are a title generator. Generate a short, descriptive title (max 50 characters) for a chat conversation based EXACTLY on the user's first message. Use the actual content and context of the message. Do not invent or add information that is not in the message. Return only the title, no quotes, no extra text, no explanations.",
           },
           {
             role: "user",
-            content: firstMessage,
+            content: `User's first message: "${cleanMessage}"\n\nGenerate a title based on this exact message:`,
           },
         ],
-        max_tokens: 20,
-        temperature: 0.7,
+        max_tokens: 30,
+        temperature: 0.3, // Lower temperature for more consistent results
       });
 
-      const title =
+      let title =
         response.choices[0]?.message?.content?.trim() ||
         `Chat ${new Date().toLocaleDateString()}`;
+      
+      // Remove quotes if present
+      title = title.replace(/^["']|["']$/g, '');
+      
+      // If title is too generic or doesn't match, use a fallback
+      if (title.length > 50 || title.toLowerCase().includes("casual chat") || title.toLowerCase().includes("video games")) {
+        // Use the first part of the message as title
+        return cleanMessage.substring(0, 50) || `Chat ${new Date().toLocaleDateString()}`;
+      }
+      
       return title.substring(0, 50); // Ensure max 50 characters
     } catch (error) {
       console.error("Error generating chat title:", error);
-      return `Chat ${new Date().toLocaleDateString()}`;
+      // Fallback: use first 50 chars of message or default
+      const fallback = firstMessage.trim().substring(0, 50) || `Chat ${new Date().toLocaleDateString()}`;
+      return fallback;
     }
   }
 }

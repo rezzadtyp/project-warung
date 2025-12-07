@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, startTransition } from "react";
 import { useBotChunk } from "@/hooks/useBotChunk";
-import { sendQuestion } from "@/utils/socket";
+import { sendQuestion } from "@/lib/socket";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
@@ -73,13 +73,12 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
   const navigate = useNavigate();
   const pendingChatIdRef = useRef<string | null>(null);
   const messagesRef = useRef<Message[]>([]);
-
-  const userId = localStorage.getItem("userId");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
   const {
     messages: chatHistory,
     isLoading,
     refetch,
-  } = useGetChatMessages(chatId || "", userId || "");
+  } = useGetChatMessages(chatId || "");
 
   // Reset state when chatId changes
   useEffect(() => {
@@ -91,11 +90,11 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
 
   // Load chat history when chatId is available
   useEffect(() => {
-    if (chatId && userId) {
+    if (chatId) {
       refetch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatId, userId]);
+  }, [chatId]);
 
   // Convert and set chat history messages
   useEffect(() => {
@@ -162,37 +161,39 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
   // Listen to bot_chunk events
   useBotChunk(
     (data) => {
-      // console.log("Chat component received bot_chunk:", data);
       // Extract text from bot chunk
       const textChunk = data.content?.[0]?.text?.value || "";
-      // console.log("Extracted text chunk:", textChunk);
 
       if (textChunk) {
-        // Update current bot message by appending chunks smoothly
         setCurrentBotMessage((prev) => {
           const newMessage = prev + textChunk;
-          // console.log("Updating bot message:", newMessage);
           return newMessage;
         });
       }
     },
     (newChatId) => {
       pendingChatIdRef.current = newChatId;
-      // Save current messages before navigating
-      saveMessagesBeforeNavigation(newChatId);
-      // Use startTransition for smooth navigation without reload appearance
-      startTransition(() => {
-        navigate(`/app/${newChatId}`, {
-          state: { preserveMessages: true },
-          replace: false,
-          preventScrollReset: true,
+    },
+    (botEndData) => {
+      if (botEndData.isNewChat && pendingChatIdRef.current) {
+        const newChatId = pendingChatIdRef.current;
+        
+        saveMessagesBeforeNavigation(newChatId);
+
+        startTransition(() => {
+          navigate(`/dashboard/chat/${newChatId}`, {
+            state: { preserveMessages: true },
+            replace: false,
+            preventScrollReset: true,
+          });
         });
-      });
+        
+        pendingChatIdRef.current = null;
+      }
     },
     [chatId]
   );
 
-  // When currentBotMessage changes and we have a message ID, update the message
   useEffect(() => {
     if (
       currentBotMessage !== undefined &&
@@ -211,10 +212,8 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
   const handleSend = () => {
     if (!inputValue.trim()) return;
 
-    // Generate unique IDs for new messages (using timestamp to avoid conflicts with API IDs)
     const baseId = Date.now();
 
-    // Add user message
     const userMessage: Message = {
       id: baseId,
       message: inputValue,
@@ -222,7 +221,6 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
     };
     setMessages((prev) => [...prev, userMessage]);
 
-    // Create bot message placeholder
     const botMessageId = baseId + 1;
     currentMessageIdRef.current = botMessageId;
     const botMessage: Message = {
@@ -231,16 +229,10 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
       sender: "recipient",
     };
     setMessages((prev) => [...prev, botMessage]);
-    setCurrentBotMessage(""); // Reset current bot message
+    setCurrentBotMessage("");
 
-    if (!userId) {
-      return;
-    }
+    sendQuestion({ question: inputValue }, user?.id || "", chatId);
 
-    // Send question to socket
-    sendQuestion({ question: inputValue }, userId, chatId);
-
-    // Clear input
     setInputValue("");
   };
 
@@ -252,7 +244,7 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
   };
 
   // Conditional rendering after all hooks
-  if (!userId) {
+  if (!user.id) {
     return <Loader className="animate-spin" />;
   }
 
@@ -267,7 +259,7 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
 
   return (
     <div className="w-full h-full flex flex-col gap-0 pb-8">
-      <div className="w-full h-[88svh] overflow-y-scroll scrollbar-default flex flex-col gap-2 px-2">
+      <div className="w-full h-[85svh] overflow-y-auto flex flex-col gap-2 px-2">
         {/* chat messages */}
         <AnimatePresence>
           {messages.map((message) => {
@@ -287,8 +279,8 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
                 <div
                   className={`flex flex-col gap-2 rounded-lg p-2 w-fit ${
                     message.sender === "recipient"
-                      ? "bg-gray-100 items-start max-w-[98%]"
-                      : "bg-blue-100 items-end self-end w-fit max-w-[98%]"
+                      ? "bg-transparent items-start max-w-[98%]"
+                      : "bg-primary text-white items-end self-end w-fit max-w-[98%]"
                   }`}
                 >
                   {message.sender === "recipient" ? (
@@ -297,7 +289,7 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: animationDuration / 1000 }}
-                      className="text-base text-gray-900 whitespace-pre-wrap wrap-break-words"
+                      className="text-base whitespace-pre-wrap wrap-break-words"
                     >
                       {message.message
                         ? parseMarkdown(message.message)
@@ -306,7 +298,7 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
                         : ""}
                     </motion.div>
                   ) : (
-                    <p className="text-base text-gray-900 whitespace-pre-wrap wrap-break-words">
+                    <p className="text-base whitespace-pre-wrap wrap-break-words">
                       {message.message}
                     </p>
                   )}

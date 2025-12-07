@@ -2,7 +2,7 @@
 export const BACKEND_URL =
   import.meta.env.VITE_PUBLIC_BACKEND_URL || "http://localhost:8888";
 export const WEBSOCKET_URL =
-  import.meta.env.VITE_PUBLIC_WEBSOCKET_URL || "ws://localhost:8888/ws";
+  import.meta.env.VITE_PUBLIC_WS_URL || "ws://localhost:8888/ws";
 export const ORACLE_HUB_ADDRESS =
   import.meta.env.VITE_PUBLIC_ORACLE_HUB_ADDRESS || "0x371A66947b203BfB411E418d850d2ea7DCD8a48D";
 export const QR_PAYMENT_ADDRESS =

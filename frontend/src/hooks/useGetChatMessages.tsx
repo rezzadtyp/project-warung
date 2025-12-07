@@ -9,7 +9,7 @@ export interface MessageType {
   role: "user" | "assistant";
 }
 
-const useGetChatMessages = (chatId: string, userId: string) => {
+const useGetChatMessages = (chatId: string) => {
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -17,9 +17,9 @@ const useGetChatMessages = (chatId: string, userId: string) => {
     try {
       setIsLoading(true);
       const response = await api.get(
-        `/chats/${userId}/${chatId}`
+        `/chat/${chatId}`
       );
-      setMessages(response.data.data.messages);
+      setMessages(response.data);
     } catch (error) {
       console.error(error);
     } finally {

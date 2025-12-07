@@ -8,6 +8,7 @@ import {
   QRPage,
   TenantEarningsPage,
 } from "./pages";
+import ChatPage from "@/pages/dashboard/ChatPage";
 
 const router = createBrowserRouter([
   {
@@ -34,11 +35,11 @@ const router = createBrowserRouter([
       },
       {
         path: "chat/new",
-        element: <ChatAreaPage />,
+        element: <ChatPage />,
       },
       {
         path: "chat/:chatId",
-        element: <ChatAreaPage />,
+        element: <ChatPage />,
       },
       {
         path: "qr",
