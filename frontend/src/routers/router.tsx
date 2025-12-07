@@ -1,14 +1,13 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import {
-  IndexLayout,
-  IndexPage,
-  DashboardLayout,
   ChatAreaPage,
   ChatListPage,
+  DashboardLayout,
+  IndexLayout,
+  IndexPage,
   QRPage,
   TenantEarningsPage,
 } from "./pages";
-import ChatPage from "@/pages/dashboard/ChatPage";
 
 const router = createBrowserRouter([
   {
@@ -35,11 +34,11 @@ const router = createBrowserRouter([
       },
       {
         path: "chat/new",
-        element: <ChatPage />,
+        element: <ChatAreaPage />,
       },
       {
         path: "chat/:chatId",
-        element: <ChatPage />,
+        element: <ChatAreaPage />,
       },
       {
         path: "qr",

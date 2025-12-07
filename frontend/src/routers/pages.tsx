@@ -13,7 +13,7 @@ export const ChatListPage = lazy(
 );
 
 export const ChatAreaPage = Loadable(
-  lazy(() => import("@/pages/dashboard/ChatAreaPage"))
+  lazy(() => import("@/pages/dashboard/ChatPage"))
 );
 export const QRPage = Loadable(lazy(() => import("@/pages/dashboard/QRPage")));
 
