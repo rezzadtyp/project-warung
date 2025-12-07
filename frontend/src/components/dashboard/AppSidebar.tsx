@@ -62,8 +62,8 @@ export function AppSidebar({
   // Logo path
   const logoSrc =
     currentTheme === "dark"
-      ? "/src/assets/warung-white.svg"
-      : "/src/assets/warung-black.svg";
+      ? "/warung-white.svg"
+      : "/warung-black.svg";
 
   const merchantMenuItems: MenuItem[] = [
     {
