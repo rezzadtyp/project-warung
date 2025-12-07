@@ -1,3 +1,5 @@
+![icon](https://github.com/user-attachments/assets/b4ef019c-da6f-4491-8fec-612ff20344e1)
+
 # PROJECT WARUNG
 Project Warung adalah sebuah project yang menggabungkan konsep simplisitas QRIS dan Web3 sebagai alat untuk mempermudah pembayaran onchain. Dimana project ini fokus pada fitur QR as payment dan juga adanya AI Chatbot untuk membantu Merchant yang masih tidak awam akan teknologi web3 tersebut. Project ini menggunakan USDT sebagai alat utama pembayaran yang mana jumlahnya akan di konversi dari nilai mata uang rupiah di dunia nyata. Katakan merchant perlu generate QR untuk pembayaran sejumlah Rp 50.000, maka customer perlu membayar sebesar kurang lebih 3.1 USDT (asumsi 1 USDT = Rp 15800). Project ini sangat terinpirasi oleh salah satu project ongoing dari Bitkub Thailand yang mana menggunakan QR to USDC payment untuk pembayaran parkir di kota Bangkok.
 
