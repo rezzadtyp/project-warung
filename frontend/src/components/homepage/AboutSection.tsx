@@ -8,6 +8,7 @@ const AboutSection = () => {
       title: "Merchant Generate QR",
       description:
         "Merchants create a unique QR code for seamless payment collection with instant currency conversion rates.",
+      image: "/generate-qr.png",
       icon: (
         <svg
           className="w-8 h-8 sm:w-10 sm:h-10"
@@ -29,6 +30,7 @@ const AboutSection = () => {
       title: "User Scan",
       description:
         "Customers simply scan the QR code with their mobile wallet to view payment details and current exchange rates.",
+      image: "/user-scan.png",
       icon: (
         <svg
           className="w-8 h-8 sm:w-10 sm:h-10"
@@ -50,6 +52,7 @@ const AboutSection = () => {
       title: "Convert & Pay with USDT",
       description:
         "Foreign currency is automatically converted to USDT in milliseconds. Users confirm and complete the payment securely.",
+      image: "/user-pay.png",
       icon: (
         <svg
           className="w-8 h-8 sm:w-10 sm:h-10"
@@ -68,9 +71,10 @@ const AboutSection = () => {
     },
     {
       number: "04",
-      title: "Transaction History",
+      title: "AI-Assistant for Merchant",
       description:
-        "Merchants receive USDT instantly and can view complete transaction history with detailed records and analytics.",
+        "Guidance to your business needs. Supports speech-to-text feature.",
+      image: "/AI-Chat-Assistant.png",
       icon: (
         <svg
           className="w-8 h-8 sm:w-10 sm:h-10"
@@ -208,41 +212,53 @@ const AboutSection = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 + 0.5 }}
                 className="relative w-full h-40 sm:h-48 lg:h-56 bg-card border border-border rounded-xl 
-                flex items-center justify-center transition-colors duration-500"
+                flex items-center justify-center overflow-hidden transition-colors duration-500"
               >
-                <div className="text-center space-y-3 sm:space-y-4">
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                {step.image ? (
+                  <motion.img
+                    src={step.image}
+                    alt={step.title}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: index * 0.1 + 0.6 }}
-                    whileHover={{ scale: 1.05 }}
-                    className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-card rounded-xl flex items-center justify-center"
-                  >
-                    <svg
-                      className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                    transition={{ duration: 0.5, delay: index * 0.1 + 0.6 }}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-center space-y-3 sm:space-y-4">
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: index * 0.1 + 0.6 }}
+                      whileHover={{ scale: 1.05 }}
+                      className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-card rounded-xl flex items-center justify-center"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.5}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </motion.div>
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: index * 0.1 + 0.7 }}
-                    className="text-muted-foreground text-xs uppercase tracking-widest font-medium"
-                  >
-                    Preview
-                  </motion.p>
-                </div>
+                      <svg
+                        className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </motion.div>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: index * 0.1 + 0.7 }}
+                      className="text-muted-foreground text-xs uppercase tracking-widest font-medium"
+                    >
+                      Preview
+                    </motion.p>
+                  </div>
+                )}
               </motion.div>
             </motion.div>
           ))}
