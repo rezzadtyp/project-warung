@@ -18,12 +18,17 @@ export default function ChatListPage() {
     data: chats,
     loading,
     updateParams,
+    refetch,
   } = useChats({
     page: 1,
     take: 20,
   });
 
   useMobileViewport();
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   // Debounce search
   useEffect(() => {

@@ -12,12 +12,20 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useSidebar } from "../utils/useSidebar";
+import { useTheme } from "@/utils/themeUtils";
 
 import { useNavigate } from "react-router-dom";
 
 import type { ChatItem } from "@/lib/types/chat";
 import type { UserRole } from "@/lib/types";
-import { MessageSquare, PanelLeft, Plus, QrCode, Receipt, Wallet } from "lucide-react";
+import {
+  MessageSquare,
+  PanelLeft,
+  Plus,
+  QrCode,
+  Receipt,
+  Wallet,
+} from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "../shared/ThemeToggle";
 
@@ -42,6 +50,21 @@ export function AppSidebar({
   const location = useLocation();
   const { toggleSidebar, state } = useSidebar();
   const navigate = useNavigate();
+  const { theme } = useTheme();
+
+  // Detect system theme
+  const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+
+  // Final theme value
+  const currentTheme = theme === "system" ? systemTheme : theme;
+
+  // Logo path
+  const logoSrc =
+    currentTheme === "dark"
+      ? "/src/assets/warung-white.svg"
+      : "/src/assets/warung-black.svg";
 
   const merchantMenuItems: MenuItem[] = [
     {
@@ -82,7 +105,7 @@ export function AppSidebar({
             onClick={() => navigate("/")}
           >
             <img
-              src="/icon.svg"
+              src={logoSrc}
               alt="Warung AI Logo"
               className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl"
             />
@@ -110,24 +133,25 @@ export function AppSidebar({
             <SidebarMenu>
               {menuItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.path;
+                // Fix: Only mark as active if it's an exact match OR if it's the Chats menu and we're viewing a specific chat (but not /new)
+                const isActive =
+                  location.pathname === item.path ||
+                  (item.path === "/dashboard/chat" &&
+                    location.pathname.startsWith("/dashboard/chat/") &&
+                    location.pathname !== "/dashboard/chat/new");
 
                 return (
                   <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton
                       asChild
                       tooltip={state === "collapsed" ? item.label : undefined}
-                      isActive={isActive}
                       className={`
                         h-8 sm:h-9 rounded-lg text-xs sm:text-sm font-medium transition-all
-
                         ${
-                          item.action
+                          isActive
                             ? "bg-primary text-primary-foreground hover:bg-primary/90"
                             : "hover:bg-accent text-foreground"
                         }
-
-                        ${isActive && !item.action ? "bg-accent" : ""}
                       `}
                     >
                       <Link to={item.path}>
@@ -192,7 +216,9 @@ export function AppSidebar({
               {walletAddress.slice(0, 6)}…{walletAddress.slice(-4)}
             </p>
           </div>
-          <ThemeToggle />
+          <div className="group-data-[collapsible=icon]:hidden">
+            <ThemeToggle />
+          </div>
         </div>
       </SidebarFooter>
     </Sidebar>

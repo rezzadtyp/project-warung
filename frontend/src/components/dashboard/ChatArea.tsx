@@ -10,13 +10,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Message } from "@/lib/types";
 import type { LanguageOption, SupportedLanguage } from "@/lib/types/languages";
-import {
-  CornerDownLeft,
-  Menu,
-  Mic,
-  MicOff,
-  Sparkles
-} from "lucide-react";
+import { CornerDownLeft, Menu, Mic, MicOff, Sparkles } from "lucide-react";
 
 interface ChatAreaProps {
   chatId: string | null;
@@ -132,8 +126,8 @@ export function ChatArea({
         </div>
       </ScrollArea>
 
-      {/* Input Area */}
-      <div className="border-t border-border bg-background/80 backdrop-blur-sm px-3 sm:px-4 py-3 sm:py-4">
+      {/* Input Area - REMOVED border-t and ADDED sticky positioning */}
+      <div className="sticky bottom-0 z-10 bg-background/80 backdrop-blur-sm px-3 sm:px-4 py-3 sm:py-4">
         <div className="mx-auto max-w-3xl">
           <div className="flex items-center gap-1.5 sm:gap-2 rounded-full border border-border bg-card px-2 sm:px-3 py-1.5 sm:py-2 shadow-sm">
             {/* Language Selector */}
