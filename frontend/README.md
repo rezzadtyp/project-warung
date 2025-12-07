@@ -1,46 +1,62 @@
-Frontend Application Documentation
-Overview
-This is a modern web application built with React, TypeScript, and Vite that provides a business assistant chatbot interface with blockchain payment integration. The application features real-time chat via Socket.IO, wallet connectivity through Reown AppKit, and smart contract interactions for QR-based payments using USDT on Ethereum.
-Tech Stack
+# Frontend Application Documentation
 
-Framework: React 19.2.0
-Language: TypeScript 5.9.3
-Build Tool: Vite 7.2.4
-Styling: Tailwind CSS 4.1.17
-UI Components: Radix UI primitives with shadcn/ui
-State Management: React hooks + Context API
-Routing: React Router DOM 7.9.6
-Real-time Communication: Socket.IO Client 4.8.1
-Blockchain:
+## Overview
 
-Wagmi 3.0.2
-Viem 2.40.3
-Reown AppKit 1.8.14
+This is a modern web application built with React, TypeScript, and Vite that provides a comprehensive business solution with:
+- **AI-Powered Chatbot** for customer assistance
+- **QR Code Payment System** for blockchain-based transactions
+- **Smart Contract Integration** for secure USDT payments on Sepolia testnet
+- **Real-time Communication** via WebSocket
 
+The application enables merchants (UMKM) to accept payments via QR codes and interact with customers through an AI assistant, while customers can easily scan QR codes and pay using their Web3 wallets.
 
-HTTP Client: Axios 1.13.2
-Animations: Framer Motion 12.23.25
+---
 
-Prerequisites
+## Tech Stack
 
-Node.js (v18 or higher)
-npm or yarn
-MetaMask or compatible Web3 wallet
-Backend API running (see backend documentation)
+- **Framework**: React 19.2.0
+- **Language**: TypeScript 5.9.3
+- **Build Tool**: Vite 7.2.4
+- **Styling**: Tailwind CSS 4.1.17
+- **UI Components**: Radix UI primitives with shadcn/ui
+- **State Management**: React hooks + Context API
+- **Routing**: React Router DOM 7.9.6
+- **Real-time Communication**: Socket.IO Client 4.8.1
+- **Blockchain**:
+  - Wagmi 3.0.2
+  - Viem 2.40.3
+  - Reown AppKit 1.8.14
+- **HTTP Client**: Axios 1.13.2
+- **Animations**: Framer Motion 12.23.25
 
-Installation
+---
 
-Navigate to the frontend directory:
+## Prerequisites
 
-bashcd frontend
+- Node.js (v18 or higher)
+- npm or yarn
+- MetaMask or compatible Web3 wallet
+- Backend API running (see backend documentation)
+- Sepolia testnet ETH for gas fees
+- Sepolia testnet USDT tokens
 
-Install dependencies:
+---
 
-bashnpm install
+## Installation
 
-Create a .env file in the frontend root directory:
+1. Navigate to the frontend directory:
+```bash
+cd frontend
+```
 
-env# Backend API
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Create a `.env` file in the frontend root directory:
+```env
+# Backend API
 VITE_PUBLIC_BACKEND_URL=http://localhost:8888/api/v1
 VITE_PUBLIC_WEBSOCKET_URL=ws://localhost:8888
 
@@ -48,20 +64,481 @@ VITE_PUBLIC_WEBSOCKET_URL=ws://localhost:8888
 VITE_PUBLIC_REOWN_PROJECT_ID=your-reown-project-id
 
 # Smart Contract Addresses (Sepolia testnet)
-VITE_PUBLIC_ORACLE_HUB_ADDRESS=0x37...
-VITE_PUBLIC_QR_PAYMENT_ADDRESS=0x30...
-VITE_PUBLIC_USDT_ADDRESS=0xfd...
-VITE_PUBLIC_REGISTRY_ADDRESS=0x08...
-Running the Application
-Development Mode
-bashnpm run dev
-The application will start at http://localhost:5173 with hot-reload enabled.
-Production Mode
-bashnpm run build
-npm run preview
+VITE_PUBLIC_ORACLE_HUB_ADDRESS=0x371A66947b203BfB411E418d850d2ea7DCD8a48D
+VITE_PUBLIC_QR_PAYMENT_ADDRESS=0x30B25eEd981bcc3E25eF0fEAF0D67D6ECD7FeDec
+VITE_PUBLIC_USDT_ADDRESS=0xfdE5BD433D87e3b12a92b4b2642103a2A9E502BE
+VITE_PUBLIC_REGISTRY_ADDRESS=0x08a6231be19B4dAD5ae8eB754000ed77Ee9EF774
 ```
 
+4. Run the application:
+```bash
+npm run dev
+```
+
+The application will start at `http://localhost:5173` with hot-reload enabled.
+
+---
+
+## Core Features
+
+### 1. 🔲 GENERATE QR (Merchant Feature)
+
+**Location**: Dashboard → QR Code Section (`/dashboard/qr`)
+
+**Purpose**: Merchants can generate QR codes containing payment information that customers can scan to make payments.
+
+#### Flow:
+
+1. **Access QR Generator**
+   - Merchant navigates to Dashboard
+   - Clicks on "QR Code" in the sidebar
+   - QR Generator component is displayed
+
+2. **Fill Payment Details**
+   - **Order ID** (required): Unique identifier for the order (e.g., "ORDER-001")
+   - **Rupiah Amount** (required): Payment amount in Indonesian Rupiah (e.g., "100000")
+   - **Reference String** (optional): Additional reference information (auto-generated if empty)
+
+3. **Generate QR Code**
+   - Merchant clicks "Generate QR Code" button
+   - System validates:
+     - Wallet is connected
+     - Order ID is provided
+     - Rupiah amount is provided
+   - QR code is generated containing JSON data:
+     ```json
+     {
+       "orderId": "ORDER-001",
+       "referenceString": "REF-1234567890",
+       "tokenAddress": "0x0000",
+       "creator": "0xMerchantAddress...",
+       "rupiahAmount": "100000"
+     }
+     ```
+
+4. **QR Code Display**
+   - QR code is displayed as SVG
+   - Shows order information below QR code
+   - Merchant can:
+     - **Download** QR code as PNG image
+     - **Share** QR code via native share API
+     - **Copy** QR data to clipboard
+
+#### Technical Details:
+
+- **Component**: `QRGenerator.tsx`
+- **QR Library**: `qrcode.react`
+- **Data Format**: JSON string encoded in QR code
+- **Token**: Always uses USDT contract address
+- **Creator**: Automatically uses connected wallet address
+
+#### Usage Example:
+
+```typescript
+import QRGenerator from "@/components/shared/QRGenerator";
+
+<QRGenerator 
+  onGenerate={(data) => {
+    console.log("QR Generated:", data);
+    // data contains: orderId, referenceString, tokenAddress, creator, rupiahAmount
+  }} 
+/>
+```
+
+---
+
+### 2. 💳 PAY QR (Customer Feature)
+
+**Location**: Homepage → Scan QR Section (`/`)
+
+**Purpose**: Customers can scan QR codes generated by merchants and make payments using their Web3 wallet.
+
+#### Flow:
+
+1. **Access QR Scanner**
+   - Customer visits homepage
+   - Scrolls to "Scan QR Code to Pay" section
+   - Camera access is requested (if not already granted)
+
+2. **Scan QR Code**
+   - Customer points camera at merchant's QR code
+   - QR scanner (`react-web-qr-reader`) reads the QR code
+   - System parses JSON data from QR code
+
+3. **Validate QR Data**
+   - System validates required fields:
+     - `orderId`
+     - `rupiahAmount`
+     - `tokenAddress`
+     - `creator` (merchant address)
+   - If invalid, error message is displayed
+
+4. **Display Payment Details Modal**
+   - Payment details modal appears showing:
+     - **Order ID**: From QR code
+     - **Reference String**: From QR code (if provided)
+     - **Amount (IDR)**: Rupiah amount formatted
+     - **Amount (USDT)**: Converted USDT amount using Oracle Hub
+     - **Token**: USDT
+     - **Merchant**: Merchant wallet address (truncated)
+
+5. **Calculate USDT Equivalent**
+   - System queries Oracle Hub contract for exchange rate
+   - Calculates: `USDT Amount = Rupiah Amount / Exchange Rate`
+   - Displays "Calculating..." while fetching rate
+   - Shows error if Oracle rate is not configured
+
+6. **Customer Reviews & Pays**
+   - Customer reviews payment details
+   - Clicks "Pay [Amount] USDT" button
+   - Wallet prompts for transaction approval
+   - Customer approves transaction in wallet
+
+7. **Transaction Processing**
+   - Smart contract `payQR` function is called with:
+     - Token address (USDT)
+     - Rupiah amount (in wei, 18 decimals)
+     - Order ID
+     - Reference string
+   - Transaction is sent to blockchain
+   - System waits for transaction confirmation
+
+8. **Payment Confirmation**
+   - On success: Green success message displayed
+   - Transaction hash is shown
+   - Modal can be closed
+   - On error: Error message displayed with details
+
+#### Technical Details:
+
+- **Component**: `ScanQR.tsx` + `PaymentDetails.tsx`
+- **QR Scanner**: `react-web-qr-reader`
+- **Smart Contract**: `UMKMQRPayment.payQR()`
+- **Oracle Integration**: `SimpleOracleHub.getTokenEquivalent()`
+- **Token Decimals**: USDT uses 6 decimals
+- **Rupiah Decimals**: 18 decimals (standard ERC20)
+
+#### Smart Contract Interaction:
+
+```typescript
+// Payment is made via payQR function
+payQR(
+  token: address,           // USDT contract address
+  rupiahAmount: uint256,    // Amount in Rupiah (18 decimals)
+  orderId: string,         // Order identifier
+  referenceString: string  // Reference information
+)
+```
+
+#### Usage Example:
+
+```typescript
+import ScanQR from "@/components/shared/ScanQR";
+import PaymentDetails from "@/components/shared/PaymentDetails";
+
+const [scannedData, setScannedData] = useState(null);
+
+<ScanQR onScan={(result) => {
+  const data = JSON.parse(result);
+  setScannedData(data);
+}} />
+
+{scannedData && (
+  <PaymentDetails 
+    qrData={scannedData}
+    onClose={() => setScannedData(null)}
+  />
+)}
+```
+
+---
+
+### 3. 💰 SETTLE QR (Merchant Feature)
+
+**Location**: Dashboard → Earnings Section (`/dashboard/earnings`)
+
+**Purpose**: Merchants can settle completed orders to withdraw funds from the smart contract to their wallet.
+
+#### Flow:
+
+1. **Access Earnings Page**
+   - Merchant navigates to Dashboard
+   - Clicks on "Earnings" in the sidebar
+   - Tenant Earnings page is displayed
+
+2. **View Earnings Summary**
+   - Total earnings from successful transactions
+   - Count of successful transactions
+   - Data fetched from backend API
+
+3. **Step 1: Get Order Hash**
+   - Merchant fills in order details:
+     - **Order ID**: Same as used in QR generation
+     - **Reference String**: Same as used in QR generation
+     - **Token Address**: USDT contract address
+     - **Creator Address**: Merchant's wallet address
+   - Clicks "Get Order Hash" button
+   - System calls smart contract `getOrderHash()` function
+   - Order hash is calculated and displayed
+
+4. **Step 2: Get Payment Info**
+   - After order hash is obtained, merchant clicks "Get Payment Info"
+   - System calls smart contract `getPaymentInfo(orderHash)` function
+   - Payment information is displayed:
+     - **Total Token Amount**: Total USDT collected for this order
+     - **Total Rupiah Amount**: Total Rupiah amount
+     - **Token Amount Issued**: Amount already withdrawn
+     - **Pending Amount**: Amount available for withdrawal (Total - Issued)
+
+5. **Step 3: Settle Order**
+   - If pending amount > 0:
+     - Merchant enters **Beneficiary Address** (where funds will be sent)
+     - Clicks "Settle Order" button
+     - Frontend sends request to backend API: `POST /api/v1/settlement/settle`
+     - Backend (as contract owner) calls `settleQROrder()` on smart contract
+     - Transaction is processed on blockchain
+   - If pending amount = 0:
+     - Message displayed: "This order has already been fully settled"
+
+6. **Settlement Confirmation**
+   - On success: Green success message with transaction hash
+   - Payment info is automatically refreshed
+   - Pending amount is updated
+   - On error: Error message displayed
+
+#### Technical Details:
+
+- **Component**: `TenantEarnings.tsx`
+- **Backend Endpoint**: `POST /api/v1/settlement/settle`
+- **Smart Contract Functions**:
+  - `getOrderHash(OrderData)`: Calculates order hash
+  - `getPaymentInfo(bytes32)`: Gets payment information
+  - `settleQROrder(address, bytes32)`: Settles order (owner only)
+- **Backend Service**: Uses contract owner's private key to call `settleQROrder`
+- **Network**: Sepolia testnet
+
+#### Order Hash Calculation:
+
+The order hash is calculated using:
+```solidity
+keccak256(
+  abi.encodePacked(
+    orderId,
+    referenceString,
+    tokenAddress,
+    creator
+  )
+)
+```
+
+#### Settlement Process:
+
+1. Frontend → Backend API with `beneficiary` and `orderHash`
+2. Backend validates request
+3. Backend creates wallet client with contract owner's private key
+4. Backend calls `settleQROrder(beneficiary, orderHash)` on smart contract
+5. Backend returns transaction hash to frontend
+6. Frontend displays success/error message
+
+#### Usage Example:
+
+```typescript
+import { settleOrder } from "@/api/settlement/settle";
+
+const result = await settleOrder({
+  beneficiary: "0x...",      // Merchant's wallet address
+  orderHash: "0x..."         // Order hash from getOrderHash
+});
+
+console.log(result.txHash);   // Transaction hash
+```
+
+---
+
+### 4. 🤖 AI CHATBOT (Customer & Merchant Feature)
+
+**Location**: Dashboard → Chat Section (`/dashboard/chat`)
+
+**Purpose**: Real-time AI-powered chatbot for customer assistance, product inquiries, and business support.
+
+#### Flow:
+
+1. **Access Chat Interface**
+   - User navigates to Dashboard
+   - Clicks on "New Chat" or selects existing chat
+   - Chat interface is displayed
+
+2. **Start New Chat**
+   - User clicks "New Chat" button
+   - New chat thread is created
+   - Chat area is displayed with empty message history
+
+3. **Send Message**
+   - User types message in input field
+   - Optional: Use voice input (speech recognition)
+   - User clicks send button or presses Enter
+   - Message is sent via WebSocket to backend
+
+4. **Real-time Response**
+   - Backend receives message via Socket.IO
+   - Backend processes message with OpenAI Assistant
+   - Response is streamed back to frontend in chunks
+   - Frontend displays streaming response character by character
+   - Response is complete when streaming ends
+
+5. **Chat History**
+   - All messages are saved to database
+   - User can view previous chats from sidebar
+   - Chat history persists across sessions
+   - User can search chats by title
+
+6. **Voice Input (Optional)**
+   - User clicks microphone button
+   - Browser requests microphone permission
+   - User speaks (supports English & Indonesian)
+   - Speech is converted to text
+   - Text is inserted into input field
+   - User can edit before sending
+
+#### Technical Details:
+
+- **Component**: `ChatArea.tsx`, `Chat.tsx`
+- **Communication**: Socket.IO WebSocket
+- **AI Provider**: OpenAI Assistant API
+- **Streaming**: Real-time chunk streaming
+- **Speech Recognition**: Web Speech API
+- **Languages**: English (en-US), Indonesian (id-ID), Auto-detect
+
+#### WebSocket Events:
+
+**Client → Server:**
+```typescript
+socket.emit("message", {
+  question: "Hello, I need help",
+  userId: "user-id",
+  chatId: "chat-id" // optional, for existing chats
+});
+```
+
+**Server → Client:**
+```typescript
+socket.on("bot_chunk", (data) => {
+  // Streaming response chunk
+  // data: { content: "chunk of text", chatId: "chat-id" }
+});
+
+socket.on("bot_error", (error) => {
+  // Error message
+});
+```
+
+#### Speech Recognition:
+
+```typescript
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+
+const {
+  transcript,
+  listening,
+  currentLanguage,
+  toggleListening,
+  changeLanguage,
+} = useSpeechRecognition({
+  onTranscriptChange: (text) => setInput(text),
+  language: "auto", // "en-US" | "id-ID" | "auto"
+});
+```
+
+#### Features:
+
+- **Streaming Responses**: Real-time character-by-character display
+- **Multi-language**: Supports English and Indonesian
+- **Voice Input**: Speech-to-text conversion
+- **Chat History**: Persistent chat threads
+- **Search**: Search chats by title
+- **Responsive**: Works on mobile and desktop
+
+---
+
+## Complete Payment Flow
+
+### End-to-End Payment Process:
+
+```
+┌─────────────┐
+│   MERCHANT  │
+└──────┬──────┘
+       │
+       │ 1. Generate QR Code
+       │    - Enter Order ID, Amount
+       │    - Generate QR with payment data
+       │
+       ▼
+┌─────────────────┐
+│   QR CODE       │
+│   (Displayed)   │
+└──────┬──────────┘
+       │
+       │ 2. Customer Scans QR
+       │
+       ▼
+┌─────────────┐
+│  CUSTOMER   │
+└──────┬──────┘
+       │
+       │ 3. Review Payment Details
+       │    - See Rupiah amount
+       │    - See USDT equivalent
+       │    - See merchant info
+       │
+       │ 4. Approve Payment
+       │    - Wallet prompts approval
+       │    - Customer confirms
+       │
+       │ 5. Transaction on Blockchain
+       │    - payQR() called
+       │    - USDT transferred to contract
+       │    - Payment recorded
+       │
+       ▼
+┌─────────────────┐
+│ SMART CONTRACT  │
+│  (Holds Funds)  │
+└──────┬──────────┘
+       │
+       │ 6. Merchant Settles Order
+       │
+       ▼
+┌─────────────┐
+│   MERCHANT  │
+└──────┬──────┘
+       │
+       │ 7. Get Order Hash
+       │    - Enter order details
+       │    - Get hash from contract
+       │
+       │ 8. Get Payment Info
+       │    - Check pending amount
+       │
+       │ 9. Request Settlement
+       │    - Send to backend API
+       │    - Backend calls settleQROrder()
+       │
+       │ 10. Funds Withdrawn
+       │     - USDT sent to merchant wallet
+       │     - Order marked as settled
+       │
+       ▼
+┌─────────────┐
+│   MERCHANT  │
+│   WALLET    │
+└─────────────┘
+```
+
+---
+
 ## Project Structure
+
 ```
 frontend/
 ├── public/
@@ -77,8 +554,15 @@ frontend/
 │   ├── assets/              # Static assets
 │   ├── components/
 │   │   ├── dashboard/       # Dashboard-specific components
+│   │   │   ├── TenantEarnings.tsx  # Settlement interface
+│   │   │   ├── QRSection.tsx       # QR Generator
+│   │   │   └── ChatArea.tsx        # Chat interface
 │   │   ├── homepage/        # Landing page components
 │   │   ├── shared/          # Reusable components
+│   │   │   ├── QRGenerator.tsx     # QR code generator
+│   │   │   ├── ScanQR.tsx          # QR code scanner
+│   │   │   ├── PaymentDetails.tsx  # Payment modal
+│   │   │   └── Chat.tsx           # Chat component
 │   │   ├── ui/              # shadcn/ui components
 │   │   └── utils/           # Component utilities
 │   ├── hooks/               # Custom React hooks
@@ -94,7 +578,10 @@ frontend/
 │   │   └── utils.ts         # Utility functions
 │   ├── pages/               # Page components
 │   │   ├── dashboard/       # Dashboard pages
-│   │   └── IndexPage.tsx    # Landing page
+│   │   │   ├── TenantEarningsPage.tsx
+│   │   │   ├── QRPage.tsx
+│   │   │   └── ChatAreaPage.tsx
+│   │   └── IndexPage.tsx    # Landing page with QR scanner
 │   ├── providers/           # Context providers
 │   │   ├── AppKitProvider.tsx
 │   │   ├── AuthProvider.tsx
@@ -116,127 +603,128 @@ frontend/
 ├── tsconfig.json
 ├── vite.config.ts
 └── components.json          # shadcn/ui configuration
-Key Features
-1. Authentication
-The application uses wallet-based authentication:
+```
 
-Connect wallet via Reown AppKit (WalletConnect v3)
-Automatic JWT token management
-Session persistence in localStorage
-Auto-logout on wallet disconnect
+---
 
-typescript// Usage in components
-import { useAuth } from "@/providers/AuthProvider";
+## API Integration
 
-const { user, login, logout, isAuthenticated, isLoading } = useAuth();
-2. Real-time Chat
-WebSocket-based chat with AI assistant:
+All API calls go through a centralized Axios instance with automatic JWT token injection and error handling.
 
-Socket.IO for real-time communication
-Streaming responses from AI
-Chat history persistence
-Multi-language speech recognition (English & Indonesian)
+### Available Endpoints
 
-typescript// Sending messages
-import { sendQuestion } from "@/utils/socket";
+#### Authentication
+- `POST /auth/me` - Authenticate with wallet address
 
-sendQuestion({ question: "Hello" }, userId, chatId);
+#### Chat
+- `GET /chat` - Get chat history with pagination
+  - Query params: `take`, `page`, `sortBy`, `sortOrder`, `search`
 
-// Receiving responses
-import { useBotChunk } from "@/hooks/useBotChunk";
+#### Transactions
+- `GET /tx` - Get transactions with pagination
+- `POST /tx` - Create new transaction
+- `PUT /tx/:txId` - Update transaction status
 
-useBotChunk(
-  (data) => {
-    // Handle streaming response chunks
-  },
-  (chatId) => {
-    // Handle chat ID assignment
-  }
-);
-3. Blockchain Integration
-Smart contract interactions for QR-based payments:
-Read Operations
-typescriptimport { useUSDTBalance, useGetOracleRate } from "@/utils/contract";
+#### Settlement
+- `POST /settlement/settle` - Settle QR payment order
+  - Body: `{ beneficiary: string, orderHash: string }`
 
-// Get USDT balance
-const { data: balance } = useUSDTBalance(address);
+### Usage Example:
 
-// Get exchange rate
-const { data: rate } = useGetOracleRate(tokenAddress);
-Write Operations
-typescriptimport { usePayQRWithWait } from "@/utils/contract";
-
-// Pay via QR code
-const { payQR, isPending, isConfirmed } = usePayQRWithWait({
-  token: CONTRACTS.USDT,
-  rupiahAmount: parseRupiah("100000"),
-  orderId: "ORDER-123",
-  referenceString: "REF-456",
-});
-4. QR Code Generation & Scanning
-Generate payment QR codes and scan them for payment:
-typescript// Generate QR
-import QRGenerator from "@/components/shared/QRGenerator";
-
-<QRGenerator onGenerate={(data) => console.log(data)} />
-
-// Scan QR
-import ScanQR from "@/components/shared/ScanQR";
-
-<ScanQR onScan={(result) => handlePayment(result)} />
-5. Theme System
-Support for light, dark, and system themes:
-typescriptimport { useTheme } from "@/utils/themeUtils";
-
-const { theme, setTheme } = useTheme();
-
-// Set theme
-setTheme("dark"); // "light" | "dark" | "system"
-API Integration
-All API calls go through a centralized Axios instance with automatic JWT token injection and error handling:
-typescriptimport api from "@/api/api";
+```typescript
+import api from "@/api/api";
 
 // GET request
 const { data } = await api.get("/chat");
 
 // POST request
 const { data } = await api.post("/auth/me", { publicKey });
-Available Endpoints
-Authentication
 
-POST /auth/me - Authenticate with wallet address
+// Settlement
+import { settleOrder } from "@/api/settlement/settle";
+const result = await settleOrder({
+  beneficiary: "0x...",
+  orderHash: "0x..."
+});
+```
 
-Chat
+---
 
-GET /chat - Get chat history with pagination
-Query params: take, page, sortBy, sortOrder, search
+## Smart Contract Integration
 
-Transactions
+### Contract Addresses (Sepolia Testnet)
 
-GET /tx - Get transactions with pagination
-POST /tx - Create new transaction
-PUT /tx/:txId - Update transaction status
+- **USDT**: `0xfdE5BD433D87e3b12a92b4b2642103a2A9E502BE`
+- **Oracle Hub**: `0x371A66947b203BfB411E418d850d2ea7DCD8a48D`
+- **QR Payment**: `0x30B25eEd981bcc3E25eF0fEAF0D67D6ECD7FeDec`
+- **Registry**: `0x08a6231be19B4dAD5ae8eB754000ed77Ee9EF774`
 
-Settlement
+### Available Hooks
 
-POST /settlement/settle - Settle QR payment order
+```typescript
+import {
+  // USDT Operations
+  useUSDTBalance,
+  useUSDTAllowance,
+  useUSDTApprove,
+  
+  // Oracle Operations
+  useGetOracleRate,
+  useGetTokenEquivalent,
+  useGetTokenEquivalentFromRupiah,
+  
+  // Payment Operations
+  usePayQR,
+  usePayQRWithWait,
+  useGetOrderHash,
+  useGetPaymentInfo,
+  
+  // Utilities
+  formatUSDT,
+  parseUSDT,
+  formatRupiah,
+  parseRupiah,
+} from "@/utils/contract";
+```
 
-Custom Hooks
-useChats
+### Format & Parse Functions
+
+```typescript
+// Format amounts for display
+formatUSDT(1000000n);        // "1.000000" (6 decimals)
+formatRupiah(100000000000000000000n); // "100.0" (18 decimals)
+
+// Parse amounts for contract calls
+parseUSDT("1.5");            // 1500000n
+parseRupiah("100000");       // 100000000000000000000n
+```
+
+---
+
+## Custom Hooks
+
+### useChats
 Fetch and manage chat list:
-typescriptconst { data, meta, loading, updateParams, refetch } = useChats({
+```typescript
+const { data, meta, loading, updateParams, refetch } = useChats({
   page: 1,
   take: 20,
 });
-useTransactions
+```
+
+### useTransactions
 Fetch and manage transactions:
-typescriptconst { data, meta, loading, updateParams, refetch } = useTransactions({
+```typescript
+const { data, meta, loading, updateParams, refetch } = useTransactions({
   page: 1,
   take: 10,
 });
-useSpeechRecognition
+```
+
+### useSpeechRecognition
 Speech-to-text input:
-typescriptconst {
+```typescript
+const {
   transcript,
   listening,
   currentLanguage,
@@ -246,129 +734,175 @@ typescriptconst {
   onTranscriptChange: (text) => setInput(text),
   language: "auto", // "en-US" | "id-ID" | "auto"
 });
-Smart Contract Utilities
-Format & Parse Functions
-typescriptimport {
-  formatUSDT,
-  parseUSDT,
-  formatRupiah,
-  parseRupiah,
-} from "@/utils/contract";
+```
 
-// Format amounts for display
-formatUSDT(1000000n); // "1.000000"
-formatRupiah(100000000000000000000n); // "100.0"
+---
 
-// Parse amounts for contract calls
-parseUSDT("1.5"); // 1500000n
-parseRupiah("100000"); // 100000000000000000000n
-Environment Variables
-Required environment variables:
-env# Backend API (required)
+## Environment Variables
+
+### Required
+
+```env
+# Backend API (required)
 VITE_PUBLIC_BACKEND_URL=http://localhost:8888/api/v1
 VITE_PUBLIC_WEBSOCKET_URL=ws://localhost:8888
 
 # Reown AppKit (required for wallet connection)
 VITE_PUBLIC_REOWN_PROJECT_ID=your-project-id
+```
 
+### Optional (with defaults)
+
+```env
 # Smart Contracts (optional, defaults provided)
-VITE_PUBLIC_ORACLE_HUB_ADDRESS=0x...
-VITE_PUBLIC_QR_PAYMENT_ADDRESS=0x...
-VITE_PUBLIC_USDT_ADDRESS=0x...
-VITE_PUBLIC_REGISTRY_ADDRESS=0x...
-Build & Deploy
-Build for Production
-bashnpm run build
-Output will be in dist/ directory.
-Preview Production Build
-bashnpm run preview
-Lint Code
-bashnpm run lint
-Responsive Design
+VITE_PUBLIC_ORACLE_HUB_ADDRESS=0x371A66947b203BfB411E418d850d2ea7DCD8a48D
+VITE_PUBLIC_QR_PAYMENT_ADDRESS=0x30B25eEd981bcc3E25eF0fEAF0D67D6ECD7FeDec
+VITE_PUBLIC_USDT_ADDRESS=0xfdE5BD433D87e3b12a92b4b2642103a2A9E502BE
+VITE_PUBLIC_REGISTRY_ADDRESS=0x08a6231be19B4dAD5ae8eB754000ed77Ee9EF774
+```
+
+---
+
+## Build & Deploy
+
+### Development Mode
+```bash
+npm run dev
+```
+
+### Production Build
+```bash
+npm run build
+npm run preview
+```
+
+### Lint Code
+```bash
+npm run lint
+```
+
+---
+
+## Responsive Design
+
 The application is fully responsive with mobile-first approach:
 
-Mobile: < 768px
-Tablet: 768px - 1024px
-Desktop: > 1024px
+- **Mobile**: < 768px
+- **Tablet**: 768px - 1024px
+- **Desktop**: > 1024px
 
 Special handling for mobile:
+- Collapsible sidebar
+- Touch-optimized inputs
+- Virtual keyboard management
+- Mobile viewport utilities
 
-Collapsible sidebar
-Touch-optimized inputs
-Virtual keyboard management
-Mobile viewport utilities
+---
 
-Browser Support
+## Browser Support
 
-Chrome/Edge (latest 2 versions)
-Firefox (latest 2 versions)
-Safari (latest 2 versions)
-Mobile browsers (iOS Safari, Chrome Mobile)
+- Chrome/Edge (latest 2 versions)
+- Firefox (latest 2 versions)
+- Safari (latest 2 versions)
+- Mobile browsers (iOS Safari, Chrome Mobile)
 
-Known Issues & Limitations
+---
 
-Speech Recognition: Only works in HTTPS context (except localhost)
-Wallet Connection: Requires MetaMask or WalletConnect-compatible wallet
-Mobile Safari: Some CSS variables may need fallbacks for older versions
-WebSocket: Ensure backend WebSocket server is accessible from frontend origin
+## Known Issues & Limitations
 
-Development Guidelines
-Adding New Components
+- **Speech Recognition**: Only works in HTTPS context (except localhost)
+- **Wallet Connection**: Requires MetaMask or WalletConnect-compatible wallet
+- **Mobile Safari**: Some CSS variables may need fallbacks for older versions
+- **WebSocket**: Ensure backend WebSocket server is accessible from frontend origin
+- **RPC Endpoints**: Public RPC endpoints may be slow; use paid providers for production
 
-Place in appropriate directory (components/dashboard, components/shared, etc.)
-Use TypeScript for type safety
-Follow shadcn/ui patterns for UI components
-Add proper prop types and documentation
+---
 
-Adding New Routes
+## Troubleshooting
 
-Create page component in src/pages/
-Add lazy-loaded export in src/routers/pages.tsx
-Define route in src/routers/router.tsx
+### Wallet Connection Issues
+- Ensure Reown Project ID is configured
+- Check browser console for connection errors
+- Try clearing browser cache and reconnecting
+- Verify wallet is connected to Sepolia testnet
 
-Adding New API Endpoints
+### WebSocket Connection Fails
+- Verify backend WebSocket server is running
+- Check CORS settings on backend
+- Ensure WebSocket URL in .env is correct
 
-Create endpoint function in src/api/
-Use the centralized api instance from src/api/api.ts
-Define TypeScript types in src/lib/types/
+### Smart Contract Calls Fail
+- Verify wallet is connected to correct network (Sepolia)
+- Check if user has sufficient ETH for gas
+- Ensure contract addresses are correct
+- Verify Oracle Hub has exchange rate configured
 
-Smart Contract Integration
+### QR Scanner Not Working
+- Ensure camera permissions are granted
+- Check if browser supports camera API
+- Try refreshing the page
+- Verify QR code format is correct JSON
 
-Add ABI to src/utils/abi.ts
-Create hooks in src/utils/contract.ts
-Use wagmi's useReadContract and useWriteContract
+### Settlement Fails
+- Verify backend has contract owner private key configured
+- Check RPC endpoint is accessible
+- Ensure order hash is correct
+- Verify payment info shows pending amount > 0
 
-Performance Optimization
+---
 
-Code splitting via lazy loading
-Memoized callbacks and context values
-Debounced search inputs
-Optimized re-renders with React.memo where appropriate
-Image optimization (use WebP when possible)
+## Security Considerations
 
-Security Considerations
+- JWT tokens stored in localStorage (consider httpOnly cookies for production)
+- All API requests use HTTPS in production
+- CORS configured on backend
+- Input sanitization on user-generated content
+- Wallet signature verification on backend
+- Contract owner private key stored securely on backend (never exposed to frontend)
 
-JWT tokens stored in localStorage (consider httpOnly cookies for production)
-All API requests use HTTPS in production
-CORS configured on backend
-Input sanitization on user-generated content
-Wallet signature verification on backend
+---
 
-Troubleshooting
-Wallet Connection Issues
+## Development Guidelines
 
-Ensure Reown Project ID is configured
-Check browser console for connection errors
-Try clearing browser cache and reconnecting
+### Adding New Components
+- Place in appropriate directory (components/dashboard, components/shared, etc.)
+- Use TypeScript for type safety
+- Follow shadcn/ui patterns for UI components
+- Add proper prop types and documentation
 
-WebSocket Connection Fails
+### Adding New Routes
+- Create page component in `src/pages/`
+- Add lazy-loaded export in `src/routers/pages.tsx`
+- Define route in `src/routers/router.tsx`
 
-Verify backend WebSocket server is running
-Check CORS settings on backend
-Ensure WebSocket URL in .env is correct
+### Adding New API Endpoints
+- Create endpoint function in `src/api/`
+- Use the centralized api instance from `src/api/api.ts`
+- Define TypeScript types in `src/lib/types/`
 
-Smart Contract Calls Fail
+### Smart Contract Integration
+- Add ABI to `src/utils/abi.ts`
+- Create hooks in `src/utils/contract.ts`
+- Use wagmi's `useReadContract` and `useWriteContract`
 
-Verify wallet is connected to correct network (Sepolia)
-Check if user has sufficient ETH for gas
-Ensure contract addresses are correct
+---
+
+## Performance Optimization
+
+- Code splitting via lazy loading
+- Memoized callbacks and context values
+- Debounced search inputs
+- Optimized re-renders with React.memo where appropriate
+- Image optimization (use WebP when possible)
+
+---
+
+## License
+
+ISC
+
+---
+
+## Support
+
+For issues and questions, please refer to the backend documentation or contact the development team.

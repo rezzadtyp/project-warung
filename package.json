@@ -18,8 +18,5 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "cd backend && npm run dev",
     "web": "cd frontend && npm run dev"
-  },
-  "dependencies": {
-    "qrcode.react": "^4.2.0"
   }
 }
