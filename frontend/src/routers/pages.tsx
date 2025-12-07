@@ -16,9 +16,7 @@ export const ChatAreaPage = Loadable(
   lazy(() => import("@/pages/dashboard/ChatAreaPage"))
 );
 export const QRPage = Loadable(lazy(() => import("@/pages/dashboard/QRPage")));
-export const TransactionsPage = Loadable(
-  lazy(() => import("@/pages/dashboard/TransactionsPage"))
-);
+
 export const TenantEarningsPage = Loadable(
   lazy(() => import("@/pages/dashboard/TenantEarningsPage"))
 );
