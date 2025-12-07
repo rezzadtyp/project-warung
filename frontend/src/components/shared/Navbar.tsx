@@ -28,8 +28,8 @@ const Navbar = () => {
   // Logo path
   const logoSrc =
     currentTheme === "dark"
-      ? "warung-white.svg"
-      : "warung-black.svg";
+      ? "/warung-white.svg"
+      : "/warung-black.svg";
   return (
     <motion.nav
       initial={{ y: -100, opacity: 0 }}
