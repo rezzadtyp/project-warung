@@ -1,3 +1,6 @@
+// AboutSection.tsx
+import { motion } from "framer-motion";
+
 const AboutSection = () => {
   const steps = [
     {
@@ -89,19 +92,37 @@ const AboutSection = () => {
   return (
     <section
       id="docs"
-      className="bg-background py-12 sm:py-20 lg:py-28 px-4 sm:px-6"
+      className="bg-background py-8 sm:py-12 lg:py-16 px-4 sm:px-6"
     >
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
-        <div className="text-center mb-12 sm:mb-24 lg:mb-32 space-y-4 sm:space-y-6">
-          <div className="inline-block mb-3 sm:mb-4">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12 sm:mb-16 lg:mb-20 space-y-4 sm:space-y-6"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="inline-block mb-3 sm:mb-4"
+          >
             <p className="text-muted-foreground text-xs sm:text-sm uppercase tracking-widest font-medium">
               Process
             </p>
             <div className="mx-auto mt-2 w-8 h-px bg-border" />
-          </div>
+          </motion.div>
 
-          <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-serif text-card-foreground leading-tight font-extralight tracking-tight px-4">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-serif text-card-foreground leading-tight font-extralight tracking-tight px-4"
+          >
             How It
             <span className="relative inline-block ml-2 sm:ml-4">
               <span className="italic font-normal">Works</span>
@@ -110,47 +131,94 @@ const AboutSection = () => {
                 transform scale-x-0 hover:scale-x-100 transition-transform duration-700"
               />
             </span>
-          </h2>
+          </motion.h2>
 
-          <p className="text-muted-foreground text-base sm:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed font-light px-4">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="text-muted-foreground text-base sm:text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed font-light px-4"
+          >
             Seamless cross-border payments in four simple steps. Fast, secure,
             and transparent.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
         {/* Steps */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
           {steps.map((step, index) => (
-            <div
+            <motion.div
               key={index}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              whileHover={{ y: -8, transition: { duration: 0.3 } }}
               className="relative group bg-card border border-border rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 
               transition-all duration-700 hover:border-primary hover:shadow-xl"
             >
               {/* Number & Icon */}
               <div className="flex items-start justify-between mb-6 sm:mb-8 lg:mb-10">
-                <span className="text-3xl sm:text-4xl font-extralight text-muted-foreground">
+                <motion.span
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
+                  className="text-3xl sm:text-4xl font-extralight text-muted-foreground"
+                >
                   {step.number}
-                </span>
-                <div className="text-muted-foreground group-hover:text-primary transition-colors">
+                </motion.span>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
+                  whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 + 0.3 }}
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  className="text-muted-foreground group-hover:text-primary transition-colors"
+                >
                   {step.icon}
-                </div>
+                </motion.div>
               </div>
 
-              <h3 className="text-2xl sm:text-3xl font-light text-card-foreground tracking-tight mb-4 sm:mb-6">
+              <motion.h3
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 + 0.3 }}
+                className="text-2xl sm:text-3xl font-light text-card-foreground tracking-tight mb-4 sm:mb-6"
+              >
                 {step.title}
-              </h3>
+              </motion.h3>
 
-              <p className="text-muted-foreground text-base sm:text-lg leading-relaxed font-light mb-6 sm:mb-8 lg:mb-10">
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 + 0.4 }}
+                className="text-muted-foreground text-base sm:text-lg leading-relaxed font-light mb-6 sm:mb-8 lg:mb-10"
+              >
                 {step.description}
-              </p>
+              </motion.p>
 
               {/* Preview Box */}
-              <div
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 + 0.5 }}
                 className="relative w-full h-40 sm:h-48 lg:h-56 bg-card border border-border rounded-xl 
                 flex items-center justify-center transition-colors duration-500"
               >
                 <div className="text-center space-y-3 sm:space-y-4">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-card rounded-xl flex items-center justify-center">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: index * 0.1 + 0.6 }}
+                    whileHover={{ scale: 1.05 }}
+                    className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-card rounded-xl flex items-center justify-center"
+                  >
                     <svg
                       className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground"
                       fill="none"
@@ -164,18 +232,23 @@ const AboutSection = () => {
                         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                  </div>
-                  <p className="text-muted-foreground text-xs uppercase tracking-widest font-medium">
+                  </motion.div>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: index * 0.1 + 0.7 }}
+                    className="text-muted-foreground text-xs uppercase tracking-widest font-medium"
+                  >
                     Preview
-                  </p>
+                  </motion.p>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           ))}
         </div>
       </div>
     </section>
   );
 };
-
 export default AboutSection;
