@@ -1,14 +1,29 @@
-import { useState, useRef, useEffect, startTransition } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  startTransition,
+  useCallback,
+} from "react";
 import { useBotChunk } from "@/hooks/useBotChunk";
 import { sendQuestion } from "@/lib/socket";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Loader } from "lucide-react";
+import { Loader, Mic, MicOff } from "lucide-react";
 import useGetChatMessages, {
   type MessageType,
 } from "@/hooks/useGetChatMessages";
+import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { SUPPORTED_LANGUAGES } from "@/lib/types/languages";
+import type { SupportedLanguage } from "@/lib/types/languages";
 
 interface Message {
   id: number;
@@ -79,6 +94,56 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
     isLoading,
     refetch,
   } = useGetChatMessages(chatId || "");
+
+  // Speech Recognition Integration
+  const handleTranscriptChange = useCallback((transcript: string) => {
+    setInputValue(transcript);
+  }, []);
+
+  const {
+    listening,
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
+    currentLanguage,
+    toggleListening,
+    changeLanguage,
+  } = useSpeechRecognition({
+    onTranscriptChange: handleTranscriptChange,
+    continuous: false,
+    language: "auto", // Start with auto-detect
+  });
+
+  const handleToggleSpeechRecognition = useCallback(() => {
+    if (!browserSupportsSpeechRecognition) {
+      console.error("Browser doesn't support speech recognition");
+      return;
+    }
+
+    if (!isMicrophoneAvailable && !listening) {
+      console.error("Microphone is not available");
+      return;
+    }
+
+    // Remove async/await for instant UI feedback
+    toggleListening(currentLanguage);
+  }, [
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
+    listening,
+    toggleListening,
+    currentLanguage,
+  ]);
+
+  const handleLanguageChange = useCallback(
+    (language: SupportedLanguage) => {
+      changeLanguage(language);
+    },
+    [changeLanguage]
+  );
+
+  const currentLangOption = SUPPORTED_LANGUAGES.find(
+    (l) => l.code === currentLanguage
+  );
 
   // Reset state when chatId changes
   useEffect(() => {
@@ -177,7 +242,7 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
     (botEndData) => {
       if (botEndData.isNewChat && pendingChatIdRef.current) {
         const newChatId = pendingChatIdRef.current;
-        
+
         saveMessagesBeforeNavigation(newChatId);
 
         startTransition(() => {
@@ -187,7 +252,7 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
             preventScrollReset: true,
           });
         });
-        
+
         pendingChatIdRef.current = null;
       }
     },
@@ -310,6 +375,49 @@ const ChatComponent = ({ chatId }: { chatId?: string }) => {
         <div ref={messagesEndRef} />
       </div>
       <div className="w-full flex items-center gap-2 flex-row">
+        {/* Language Selector Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-muted flex-shrink-0"
+            >
+              <span className="text-sm">{currentLangOption?.flag}</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            {SUPPORTED_LANGUAGES.map((lang) => (
+              <DropdownMenuItem
+                key={lang.code}
+                onClick={() => handleLanguageChange(lang.code)}
+                className="gap-2"
+              >
+                <span>{lang.flag}</span>
+                <span>{lang.label}</span>
+                {currentLanguage === lang.code && <span>✓</span>}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Microphone Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className={`rounded-full transition-all flex-shrink-0 ${
+            listening ? "bg-destructive/20 text-destructive" : "hover:bg-muted"
+          }`}
+          onClick={handleToggleSpeechRecognition}
+          disabled={!browserSupportsSpeechRecognition}
+        >
+          {listening ? (
+            <MicOff className="h-4 w-4" />
+          ) : (
+            <Mic className="h-4 w-4" />
+          )}
+        </Button>
+
         <Input
           placeholder="Ask anything"
           value={inputValue}

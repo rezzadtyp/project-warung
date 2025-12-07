@@ -73,6 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setIsLoading(true);
       const data = await loginWithWallet(publicKey);
+      localStorage.setItem("jwt", data.token);
 
       // Store user data in localStorage
       localStorage.setItem("user", JSON.stringify(data));

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import SpeechRecognition, {
   useSpeechRecognition as useReactSpeechRecognition,
 } from "react-speech-recognition";
@@ -32,20 +32,20 @@ export const useSpeechRecognition = ({
     }
   }, [transcript, onTranscriptChange]);
 
-  const startListening = async (lang?: SupportedLanguage) => {
-    try {
+  const startListening = useCallback(
+    (lang?: SupportedLanguage) => {
       const languageToUse = lang || currentLanguage;
 
       // Auto detect: try both English and Indonesian
       if (languageToUse === "auto") {
         // Start with English, then switch to Indonesian if needed
         // Note: True auto-detect requires testing both, but we'll default to English
-        await SpeechRecognition.startListening({
+        SpeechRecognition.startListening({
           continuous,
           language: "en-US", // Default to English for auto
         });
       } else {
-        await SpeechRecognition.startListening({
+        SpeechRecognition.startListening({
           continuous,
           language: languageToUse,
         });
@@ -54,38 +54,48 @@ export const useSpeechRecognition = ({
       if (lang) {
         setCurrentLanguage(lang);
       }
-    } catch (error) {
-      console.error("Failed to start listening:", error);
-    }
-  };
+    },
+    [continuous, currentLanguage]
+  );
 
-  const stopListening = async () => {
-    try {
-      await SpeechRecognition.stopListening();
-    } catch (error) {
-      console.error("Failed to stop listening:", error);
-    }
-  };
+  const stopListening = useCallback(() => {
+    SpeechRecognition.stopListening();
+  }, []);
 
-  const abortListening = async () => {
-    try {
-      await SpeechRecognition.abortListening();
-    } catch (error) {
-      console.error("Failed to abort listening:", error);
-    }
-  };
+  const abortListening = useCallback(() => {
+    SpeechRecognition.abortListening();
+  }, []);
 
-  const toggleListening = async (lang?: SupportedLanguage) => {
-    if (listening) {
-      await stopListening();
-    } else {
-      await startListening(lang);
-    }
-  };
+  const toggleListening = useCallback(
+    (lang?: SupportedLanguage) => {
+      if (listening) {
+        SpeechRecognition.stopListening();
+      } else {
+        const languageToUse = lang || currentLanguage;
 
-  const changeLanguage = (lang: SupportedLanguage) => {
+        if (languageToUse === "auto") {
+          SpeechRecognition.startListening({
+            continuous,
+            language: "en-US",
+          });
+        } else {
+          SpeechRecognition.startListening({
+            continuous,
+            language: languageToUse,
+          });
+        }
+
+        if (lang) {
+          setCurrentLanguage(lang);
+        }
+      }
+    },
+    [listening, continuous, currentLanguage]
+  );
+
+  const changeLanguage = useCallback((lang: SupportedLanguage) => {
     setCurrentLanguage(lang);
-  };
+  }, []);
 
   return {
     transcript,
